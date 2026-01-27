@@ -27,6 +27,14 @@ Testing:
 - Unit tests for code resolution (valid code, invalid code, passthrough for city names)
 - Live test: search using 'TPE' should return Taipei hotels
 
+## Notes
+
+CSV source verified 2026-01-27:
+- URL returns HTTP 200, ~9800 rows, well-structured (code,icao,name,...,city,...)
+- Repo: github.com/lxndrblz/Airports — 204 stars, last pushed 2025-10-11, actively maintained
+- Confirmed NRT→Tokyo(via city_code TYO), TPE→Taoyuan City, CDG→Paris(via city_code PAR), JFK→Inwood(via city_code NYC), LAX→El Segundo
+- Note: the `city` column is sometimes the suburb, not the metro name. The `city_code` column maps to metro areas (TYO, NYC, PAR). Consider resolving via city_code to a known metro name, or using the city column with a small override map for common cases.
+
 ## Acceptance Criteria
 
 - Airport codes like NRT, TPE, CDG resolve to city names

@@ -15,6 +15,16 @@ Add a 'hotella details <url>' command to scrape detailed info from a specific Go
 
 Would extract: detailed reviews, room types, photos, full amenity list, booking links with prices from multiple providers.
 
+## ⚠️ Design Decisions Needed
+
+This ticket requires research and design work before implementation:
+- What does the Google Hotels detail page structure look like? Need to inspect and document selectors.
+- What data is reliably extractable vs. dynamically loaded (may need JS execution)?
+- Should this accept a hotel name + dates instead of a raw URL?
+- Output format design for room types and multi-provider pricing.
+
+Recommend: spike/research task first, then refine acceptance criteria before starting.
+
 ## Acceptance Criteria
 
 - Accepts a Google Hotels URL

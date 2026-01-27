@@ -18,6 +18,17 @@ Usage:
 
 This would fetch hotels for each date range and display a side-by-side comparison showing which dates are cheapest for the same hotel.
 
+## ⚠️ Design Decisions Needed
+
+This ticket requires design work before implementation:
+- How to match "same hotel" across date ranges (name exact match? fuzzy? URL-based ID?)
+- Output layout for side-by-side comparison — especially with many date ranges or many hotels
+- Should it highlight the cheapest range per hotel?
+- How to handle hotels that appear in one range but not another (show N/A or omit?)
+- Performance: multiple fetches in parallel or sequential? Rate limiting concerns?
+
+Recommend: mock up the desired output format first, then implement.
+
 ## Acceptance Criteria
 
 - Compare command accepts multiple date ranges

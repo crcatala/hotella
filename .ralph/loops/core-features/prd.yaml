@@ -1,0 +1,123 @@
+# Core Feature Completion (Epic: hot-6a17)
+#
+# Implements the remaining P2 core features that were deferred from the MVP.
+# All tasks are independent of each other but each depends on the dev tooling
+# (hot-2758) which is already complete.
+#
+# After this loop, the codebase will have: client-side filters, multi-currency
+# support, table output, IATA airport code resolution, and improved errors.
+
+name: "Core Feature Completion"
+description: |
+  Complete the remaining core features from the implementation plan (Stages 2-5).
+  Adds filtering, multi-currency, table output, IATA resolution, and error improvements.
+branch: "ralph/core-features"
+create_pr: true
+pr_title: "feat: core features — filters, currency, table output, IATA, error messages"
+issue_tracker: none
+pre_commit: "pnpm run verify"
+
+tasks:
+  - id: hot-a6e9
+    title: "Client-side price and rating filters"
+    status: pending
+    acceptance:
+      - "--min-price, --max-price, --min-rating flags work correctly on the search command"
+      - "Filters implemented in src/lib/filters.ts with filterByPrice and filterByRating functions"
+      - "Hotels with null price excluded when price filter is active; null rating excluded when rating filter is active"
+      - "Filters applied after parsing, before sorting"
+      - "Summary counts reflect filtered results"
+      - "Clear message when all results filtered out: 'No hotels match your filters'"
+      - "--min-rating validated to 0-5 range"
+      - "Verbose output shows '→ Filtered: N of M hotels match criteria'"
+      - "Unit tests for filterByPrice (min only, max only, both, null handling) and filterByRating"
+      - "pnpm run verify passes"
+    notes: |
+      Implementation location: src/lib/filters.ts (new file)
+      CLI changes: src/commands/search.ts — add three new options
+      Apply filters after parsing, before sorting.
+      Edge cases: null prices/ratings excluded when respective filter active;
+      open-ended ranges (only min or only max); all hotels filtered out.
+
+  - id: hot-8075
+    title: "Multi-currency price parsing and --currency flag"
+    status: pending
+    acceptance:
+      - "--currency flag accepted with codes: USD, EUR, GBP, JPY, TWD (at minimum)"
+      - "Currency passed to fetcher as 'curr' query param"
+      - "Parser handles: USD ($123), EUR (€123 or 123 €), GBP (£123), JPY (¥12,345), TWD (NT$1,234)"
+      - "Comma vs period thousands separator handled based on currency/locale"
+      - "Fallback: extract any number that looks like a price if specific pattern fails"
+      - "Plain output shows appropriate currency symbol for the selected currency"
+      - "JSON output reflects the requested currency"
+      - "Unit tests for each currency pattern with sample text"
+      - "pnpm run verify passes"
+    notes: |
+      CLI changes: src/commands/search.ts — add --currency <code> option (default: USD)
+      Parser enhancements: src/lib/parser.ts — currency-aware price extraction.
+      The URL builder already has a 'curr' param slot.
+      The Hotel type already has a currency field in JSON output.
+
+  - id: hot-8726
+    title: "Table output format (--table)"
+    status: pending
+    acceptance:
+      - "--table flag produces aligned columnar output"
+      - "Columns: Name (35 chars), Price (8), Rating (6), Amenities (30+)"
+      - "Name and amenities truncated with ellipsis when exceeding column width"
+      - "Price column right-aligned"
+      - "Null price shows 'N/A', null rating shows '-'"
+      - "'table' added to OutputFormat type in src/cli/context.ts"
+      - "Unit tests for table formatting with various data including null values"
+      - "pnpm run verify passes"
+    notes: |
+      Add --table flag to global options in src/cli/program.ts.
+      Add 'table' to OutputFormat type in src/cli/context.ts.
+      Implement table formatter — can be a simple string builder, no need for a table library.
+      Auto-detect terminal width if possible, otherwise use fixed widths.
+      Example output:
+        Name                               Price     Rating  Amenities
+        ─────────────────────────────────  ────────  ──────  ──────────────────────────
+        MEANDER Taipei                     $32       4.6     Free Wi-Fi, Air conditioning
+
+  - id: hot-e7c5
+    title: "IATA airport code → city resolution"
+    status: pending
+    acceptance:
+      - "Airport codes like NRT, TPE, CDG resolve to city names"
+      - "Implemented in src/lib/iata.ts with resolveLocation(input) function"
+      - "CSV fetched from https://raw.githubusercontent.com/lxndrblz/Airports/refs/heads/main/airports.csv"
+      - "CSV cached to ~/.cache/hotella/airports.csv with 7-day TTL"
+      - "Non-IATA inputs (city names, multi-word strings) pass through unchanged"
+      - "Fallback list of ~50 common airports bundled for offline use"
+      - "Verbose output: '→ Resolving location \"NRT\" → \"Tokyo\"'"
+      - "Integrated into search command: resolve location before passing to fetcher"
+      - "Unit tests with mocked fetch for CSV download, cache TTL, code resolution"
+      - "pnpm run verify passes"
+    notes: |
+      CSV source verified 2026-01-27: HTTP 200, ~9800 rows, well-structured.
+      Repo github.com/lxndrblz/Airports — 204 stars, actively maintained.
+
+      IMPORTANT: The CSV `city` column sometimes has suburbs instead of metro names
+      (e.g. JFK → "Inwood", LAX → "El Segundo"). The `city_code` column maps to
+      metro areas (TYO, NYC, PAR). Consider using city_code with a known metro name
+      mapping, or use the city column with a small override map for common cases.
+      The goal is that NRT→"Tokyo", CDG→"Paris", JFK→"New York", etc.
+
+  - id: hot-9387
+    title: "Improved user-friendly error messages"
+    status: pending
+    acceptance:
+      - "Past dates rejected with message: 'Check-in date YYYY-MM-DD is in the past. Use a future date.'"
+      - "Network errors show: 'Failed to connect to Google Hotels. Check your internet connection.'"
+      - "No results show: 'No hotels found for \"X\". Try a different location or broader dates.'"
+      - "Parse failure (0 cards from non-empty HTML) shows: 'Failed to parse hotel data. Google may have changed their page layout. Try --debug for details.'"
+      - "Rate limiting suggests waiting/retrying"
+      - "All errors show actionable suggestions"
+      - "Fetcher errors wrapped with user-friendly ApiError messages"
+      - "pnpm run verify passes"
+    notes: |
+      Add past-date validation in search command.
+      Wrap fetcher errors with ApiError and user-friendly messages.
+      Add specific error for parse failures (0 hotels from non-empty HTML).
+      Invalid date format handling already done — don't break it.

@@ -1,0 +1,94 @@
+# Polish & Production Quality (Epic: hot-4b53)
+#
+# Backfills test coverage, adds rich help text, and writes a comprehensive README.
+# This loop should run AFTER core-features completes, since the test suite needs
+# to cover filters, currency, table output, and IATA features.
+
+name: "Polish & Production Quality"
+description: |
+  Stage 6 polish work: comprehensive test suite with fixtures, rich help text
+  with examples, and a full README suitable for an open-source project.
+branch: "ralph/polish"
+create_pr: true
+pr_title: "chore: test suite, help text, and README"
+issue_tracker: none
+pre_commit: "pnpm run verify"
+
+tasks:
+  - id: hot-c9fd
+    title: "Comprehensive test suite with HTML fixtures"
+    status: pending
+    acceptance:
+      - "Stripped-down HTML fixture at tests/fixtures/google-hotels-cards.html containing only hotel card divs"
+      - "Fixture covers representative cases: normal hotel, missing price, missing rating, mixed-language name, hotel with many amenities"
+      - "Full ~2.7MB HTML NOT committed to the repo"
+      - "scripts/update-fixture.sh fetches fresh Google Hotels page, extracts card elements, overwrites fixture"
+      - "scripts/update-fixture.sh also saves full raw HTML to gitignored tests/fixtures/.raw/ for debugging"
+      - "tests/fixtures/.raw/ added to .gitignore"
+      - "Unit tests: parser.test.ts — parse fixture HTML to Hotel[], test name/price/rating/amenities/URL extraction, edge cases (missing price, missing rating, mixed-language names, no cards found)"
+      - "Unit tests: sort.test.ts — all sort modes (price-asc, price-desc, rating, value), edge cases (all prices null, single result, empty array, nulls-last)"
+      - "Unit tests: cli.test.ts — arg parsing, help output, validation errors (bad dates, invalid guest counts, date ordering)"
+      - "Integration tests: cli.test.ts — subprocess tests via child_process.execFile, verify exit codes (0, 1, 2), stdout/stderr separation, --json produces valid JSON, --plain expected format, --help exits 0"
+      - "Live tests: search.live.test.ts — gated behind HOTELLA_LIVE_TEST=1, real fetch+parse, returns >0 hotels with valid structure"
+      - "Live tests excluded from default vitest run"
+      - "All non-live tests pass without network access"
+      - "pnpm run verify passes"
+    notes: |
+      Test locations: tests/unit/, tests/integration/, tests/live/
+      Vitest should be configured to exclude tests/live/** from default runs.
+      The pnpm test:live script should set HOTELLA_LIVE_TEST=1 and include live tests.
+
+      For the fixture: capture a real response, then extract just the hotel card
+      container divs. Keep it minimal — 5-8 cards covering the edge cases.
+      The update script is for humans to run when selectors break.
+
+      Tests should cover ALL features including those from the core-features loop:
+      filters (filterByPrice, filterByRating), currency parsing, table output
+      formatting, and IATA resolution.
+
+  - id: hot-2a08
+    title: "Rich help text with examples"
+    status: pending
+    acceptance:
+      - "hotella --help shows common usage examples with descriptions"
+      - "hotella search --help shows search-specific examples"
+      - "Examples include: basic search, sort+limit, airport code, JSON output with jq"
+      - "Output format explanations for --json, --plain, --table"
+      - "Environment variables section (NO_COLOR)"
+      - "Examples styled with ctx.colors.command() for commands and ctx.colors.muted() for descriptions in TTY mode"
+      - "Uses commander addHelpText('afterAll', ...) pattern"
+      - "pnpm run verify passes"
+    notes: |
+      Follow the cli-playbook addHelpText pattern.
+      Add afterAll help text to the program showing examples.
+
+      Examples to show:
+        hotella search "Taipei" --checkin 2026-02-10 --checkout 2026-02-17
+          Search hotels in Taipei for a week
+        hotella search "Tokyo" --checkin 2026-03-01 --checkout 2026-03-05 --sort price-asc --limit 5
+          Cheapest 5 hotels in Tokyo
+        hotella search "NRT" --checkin 2026-06-01 --checkout 2026-06-07
+          Search using airport code
+        hotella search "Paris" --checkin 2026-04-01 --checkout 2026-04-03 --json | jq
+          JSON output for scripting
+
+  - id: hot-2561
+    title: "Comprehensive README with install instructions and examples"
+    status: pending
+    acceptance:
+      - "README covers: project description and motivation"
+      - "Installation section: pnpm install, npm install, npx usage"
+      - "Quick start with copy-paste example"
+      - "Full CLI reference covering all commands and flags (including filters, currency, table, IATA)"
+      - "Output format examples for plain, JSON, and table"
+      - "How it works section: impit + cheerio, no browser needed, ~0.3s response time"
+      - "Known limitations: scraping fragility, rate limiting, currency support scope"
+      - "Development section: setup, running tests, project structure"
+      - "Contributing guidelines"
+      - "License section"
+      - "pnpm run verify passes"
+    notes: |
+      This is the final task — the README should reflect the complete state of the
+      CLI including all features added in core-features and polish loops.
+      Make sure examples actually work with the current CLI interface.
+      Keep it concise but thorough — suitable for a standalone open-source project.

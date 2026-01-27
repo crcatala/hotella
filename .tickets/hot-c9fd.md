@@ -14,10 +14,9 @@ tags: [quality, testing]
 Build out the full test suite as described in the implementation plan's testing strategy.
 
 Fixture setup:
-- Save a real Google Hotels HTML response as tests/fixtures/google-hotels.html
-- Gzip it (~2.7MB → ~250KB): tests/fixtures/google-hotels.html.gz
-- Load in tests via gunzipSync(readFileSync(...))
-- Alternatively, extract just the relevant hotel card divs into a smaller fixture
+- Capture a real Google Hotels HTML response, then strip it down to just the relevant hotel card divs (not the full page). Commit a minimal fixture (tests/fixtures/google-hotels-cards.html) that contains only the structural elements the parser needs — a handful of representative cards covering: normal hotel, missing price, missing rating, mixed-language name, hotel with many amenities.
+- Do NOT commit the full ~2.7MB HTML response to the repo.
+- Add scripts/update-fixture.sh: a convenience script that fetches a fresh Google Hotels page, extracts the card elements, and overwrites the fixture file. This is for humans to run when selectors break and we need to investigate what changed in Google's markup. The script should also save the full raw HTML to a gitignored location (tests/fixtures/.raw/) for debugging.
 
 Unit tests (tests/unit/):
 - parser.test.ts: Parse fixture HTML → correct Hotel[]. Test name, price, rating, amenities, URL extraction. Edge cases: missing price, missing rating, Chinese/mixed-language names, no cards found.
