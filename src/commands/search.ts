@@ -89,11 +89,9 @@ export function registerSearchCommand(program: Command, ctx: CliContext): void {
       const checkin = validateDate(opts.checkin, 'check-in')
       const checkout = validateDate(opts.checkout, 'check-out')
 
-      // Reject past dates
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
-      const checkinDate = new Date(`${checkin}T00:00:00`)
-      if (checkinDate < today) {
+      // Reject past dates (compare YYYY-MM-DD strings — lexicographic ordering is correct)
+      const todayStr = new Date().toISOString().slice(0, 10)
+      if (checkin < todayStr) {
         throw new UsageError(`Check-in date ${checkin} is in the past. Use a future date.`)
       }
 
@@ -226,10 +224,14 @@ export function registerSearchCommand(program: Command, ctx: CliContext): void {
       }
 
       // Output
-      if (ctx.output.format === 'json') {
+      if (allFilteredOut) {
+        if (ctx.output.format === 'json') {
+          output(JSON.stringify(result, null, 2))
+        } else {
+          output('No hotels match your filters.')
+        }
+      } else if (ctx.output.format === 'json') {
         output(JSON.stringify(result, null, 2))
-      } else if (allFilteredOut) {
-        output('No hotels match your filters.')
       } else if (ctx.output.format === 'table') {
         output(formatTableOutput(result))
       } else {
