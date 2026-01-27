@@ -1,0 +1,197 @@
+# OSS + npm v0.1.0 Release Readiness (Epic: hot-fe21)
+#
+# Prepares the repo for public OSS release and npm publish.
+# Covers: legal (LICENSE), packaging (package.json, version), documentation
+# (CHANGELOG, CONTRIBUTING), CI/CD (workflow, security hardening), and
+# release automation (release-it).
+#
+# This loop is INDEPENDENT of core-features and polish — run in parallel.
+#
+# After this loop completes, TWO human checkpoints remain:
+#   1. hot-4418 — Pre-migration verification gate (also needs polish loop done)
+#   2. hot-1ff8 — Final npm publish (irreversible, human must execute)
+
+name: "OSS + npm v0.1.0 Release Readiness"
+description: |
+  Prepare the repository for public open-source release and first npm publish.
+  Adds LICENSE, cleans up package.json, sets up CI, hardens security, configures
+  release automation, and adds contributor documentation.
+
+  ⚠️ After merging this PR, human verification is required before publishing:
+  see .ralph/loops/oss-prep/RELEASE-CHECKLIST.md for the three manual checkpoints
+  (PR review → verification gate → npm publish). The gate also requires the
+  core-features and polish loops to be merged first.
+branch: "ralph/oss-prep"
+create_pr: true
+pr_title: "chore: OSS release readiness — LICENSE, CI, release-it, docs"
+issue_tracker: none
+pre_commit: "pnpm run verify"
+
+tasks:
+  # ── Phase 1: Foundation (no dependencies) ─────────────────────────────
+  - id: hot-b5cc
+    title: "Add LICENSE file"
+    status: pending
+    acceptance:
+      - "MIT LICENSE file exists at repo root"
+      - "Copyright year is 2026, copyright holder matches git remote owner"
+      - "package.json has \"license\": \"MIT\" field"
+      - "pnpm run verify passes"
+    notes: |
+      Standard MIT license text. Check git remote for the owner name.
+      Project created January 2026.
+
+  - id: hot-cdde
+    title: "Package.json cleanup for npm publish"
+    status: pending
+    acceptance:
+      - "\"repository\" field points to github.com/crcatala/hotella (infer from git remote)"
+      - "\"homepage\" field set (GitHub repo URL)"
+      - "\"bugs\" field set (GitHub issues URL)"
+      - "\"keywords\" array includes: hotel, travel, cli, google-hotels, price-comparison, scraper, terminal"
+      - "\"author\" field set (infer from git config or repo owner)"
+      - "\"license\": \"MIT\" field present"
+      - "\"prepublishOnly\" script runs \"pnpm run verify && pnpm run build\""
+      - "\"files\" array includes LICENSE and CHANGELOG.md in addition to existing entries"
+      - "npm pack --dry-run shows only intended files (dist/, README.md, LICENSE, CHANGELOG.md, package.json)"
+      - "pnpm run verify passes"
+    notes: |
+      Current files field: ["dist", "README.md"]. Add "LICENSE" and "CHANGELOG.md".
+      The prepare script (lefthook) already has || true so it's safe for npm consumers.
+      Run `npm pack --dry-run` to verify the package contents.
+
+  - id: hot-1d37
+    title: "Dynamic version from package.json"
+    status: pending
+    acceptance:
+      - "No hardcoded version string in src/cli/program.ts"
+      - "Version is read from package.json at build time or runtime"
+      - "hotella --version output matches package.json version exactly"
+      - "The banner text (beforeAll help) also shows the dynamic version"
+      - "pnpm run verify passes"
+    notes: |
+      Current code: src/cli/program.ts line 5 has `const VERSION = '0.1.0'`.
+      Options:
+      1. Runtime: read package.json with readFileSync + fileURLToPath
+      2. Build-time: generate a version.ts from a script
+      3. Import assertion: import pkg from '../package.json' assert { type: 'json' }
+      Choose whichever approach is simplest and works with the existing build.
+      Make sure it works from both `pnpm dev` (tsx) and `dist/cli.js` (compiled).
+
+  - id: hot-81cd
+    title: "Add CHANGELOG.md"
+    status: pending
+    acceptance:
+      - "CHANGELOG.md exists at repo root"
+      - "Follows Keep a Changelog format (https://keepachangelog.com/)"
+      - "Has [Unreleased] section at top"
+      - "Has [0.1.0] section with date placeholder (YYYY-MM-DD)"
+      - "0.1.0 section lists: hotel search via Google Hotels, plain/JSON output, sort options, verbose/debug modes, NO_COLOR support"
+      - "Comparison links at bottom follow keepachangelog convention"
+      - "pnpm run verify passes"
+    notes: |
+      The release date for 0.1.0 will be filled in by release-it's
+      keep-a-changelog plugin at publish time. Use a placeholder date for now.
+
+  # ── Phase 2: Docs + CI (depend on package.json) ──────────────────────
+  - id: hot-605d
+    title: "Add CONTRIBUTING.md"
+    status: pending
+    acceptance:
+      - "CONTRIBUTING.md exists at repo root"
+      - "Covers prerequisites: Node 22+, pnpm"
+      - "Getting started: clone, pnpm install, pnpm dev"
+      - "Development commands: test, lint, format, typecheck, verify"
+      - "Project structure overview (src/cli/, src/commands/, src/lib/)"
+      - "How to submit changes (branch, PR process)"
+      - "Code style section (enforced by oxlint + prettier)"
+      - "References verify script as single source of truth for CI checks"
+      - "pnpm run verify passes"
+    notes: |
+      Keep it concise. Match actual tooling: pnpm (not npm/bun),
+      oxlint (not eslint), prettier, vitest, tsx for dev.
+      Release process section can say "see release-it config" — it will
+      be set up by a later task in this loop.
+
+  - id: hot-9e30
+    title: "Add CI workflow for PRs and pushes"
+    status: pending
+    acceptance:
+      - ".github/workflows/ci.yml exists"
+      - "Triggers on push to main and pull_request to main"
+      - "Single job to minimize setup overhead"
+      - "Uses pnpm with --frozen-lockfile"
+      - "Pins Node version to 22"
+      - "Runs pnpm run verify (covers lint, typecheck, format, test, build)"
+      - "Workflow is valid YAML (check with actionlint if available, otherwise manual review)"
+      - "pnpm run verify passes"
+    notes: |
+      Use pnpm/action-setup for pnpm installation.
+      Use actions/setup-node with node-version: 22 and cache: pnpm.
+      Single job is preferred over multiple jobs to avoid repeated setup.
+      Pin action versions to SHA commits (will be refined in next task, but
+      start with version tags for now if SHA lookup is inconvenient).
+
+  # ── Phase 3: Security hardening (depend on CI) ───────────────────────
+  - id: hot-995a
+    title: "Pin GitHub Actions to SHA commits"
+    status: pending
+    acceptance:
+      - "All uses: lines in .github/workflows/*.yml reference full SHA commits"
+      - "Each SHA line has a comment indicating the human-readable version (e.g., # v4.2.2)"
+      - "SHAs are verified correct for the stated versions"
+      - "Workflow still functions correctly (YAML is valid)"
+      - "pnpm run verify passes"
+    notes: |
+      Look up the current SHA for each action used in ci.yml (and any other
+      workflows created by prior tasks). Use the tag's commit SHA, not the
+      branch HEAD.
+      Example: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+  - id: hot-9fcd
+    title: "Add secret scanning to CI"
+    status: pending
+    acceptance:
+      - ".github/workflows/secret-scan.yml exists"
+      - "Uses gitleaks/gitleaks-action (preferred) or equivalent"
+      - "Runs on push and pull_request"
+      - "Action pinned to SHA commit with version comment"
+      - "pnpm run verify passes"
+    notes: |
+      Use gitleaks — it's open source and widely used.
+      Keep it as a separate workflow file for clarity.
+      Pin the action to SHA like the other workflows.
+
+  - id: hot-ba0c
+    title: "Add CODEOWNERS for workflow protection"
+    status: pending
+    acceptance:
+      - ".github/CODEOWNERS file exists"
+      - "/.github/workflows/ directory is owned by @crcatala"
+      - "File follows GitHub CODEOWNERS syntax"
+      - "pnpm run verify passes"
+    notes: |
+      Simple file — just needs the one rule for workflow protection.
+      Infer owner from git remote URL.
+
+  # ── Phase 4: Release automation (depends on CHANGELOG + CONTRIBUTING) ─
+  - id: hot-c4c6
+    title: "Add release-it for automated releases"
+    status: pending
+    acceptance:
+      - "release-it and @release-it/keep-a-changelog installed as devDependencies"
+      - ".release-it.json config exists with git, github, npm, hooks, and plugin sections"
+      - "\"release\" script added to package.json: \"release-it\""
+      - "hooks.before:init runs pnpm run verify"
+      - "hooks.after:bump runs pnpm run build"
+      - "keep-a-changelog plugin configured for CHANGELOG.md"
+      - "git.requireBranch set to main"
+      - "npm.publishArgs includes --access public"
+      - "pnpm run release -- --dry-run completes without errors"
+      - "CONTRIBUTING.md updated with release process section"
+      - "pnpm run verify passes"
+    notes: |
+      Config adapted from raindrop-cli's .release-it.json.
+      Key differences from raindrop-cli: uses pnpm instead of bun.
+      The dry-run test is important — it validates the full pipeline
+      without actually publishing.
