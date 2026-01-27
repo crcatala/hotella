@@ -32,7 +32,8 @@
     "typecheck": "bash scripts/check.sh typecheck",
     "typecheck:verbose": "tsc --noEmit",
     "verify": "npx tsx scripts/verify.ts",
-    "verify:verbose": "VERBOSE=1 npx tsx scripts/verify.ts"
+    "verify:verbose": "VERBOSE=1 npx tsx scripts/verify.ts",
+    "prepare": "lefthook install || true"
   },
   "dependencies": {
     "cheerio": "^1.0.0",
@@ -42,6 +43,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "lefthook": "^2.0.16",
     "oxlint": "^1.42.0",
     "prettier": "^3.8.1",
     "tasuku": "^2.0.5",
