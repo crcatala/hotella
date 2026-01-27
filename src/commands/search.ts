@@ -2,6 +2,7 @@ import type { Command } from 'commander'
 import type { CliContext } from '../cli/context.js'
 import { ApiError, UsageError } from '../cli/errors.js'
 import { logDebug, logVerbose, output } from '../cli/output.js'
+import { withSpinner } from '../cli/spinner.js'
 import { fetchHotelsHtml } from '../lib/fetcher.js'
 import { filterByPrice, filterByRating } from '../lib/filters.js'
 import { resolveLocation } from '../lib/iata.js'
@@ -132,7 +133,9 @@ export function registerSearchCommand(program: Command, ctx: CliContext): void {
       }
 
       // Resolve IATA airport codes to city names
-      const locationResult = await resolveLocation(location)
+      const locationResult = await withSpinner(ctx, 'Resolving location', () =>
+        resolveLocation(location),
+      )
       const resolvedLocation = locationResult.resolved
       if (locationResult.wasIata) {
         logVerbose(ctx, `Resolving location "${locationResult.original}" → "${resolvedLocation}"`)
@@ -152,7 +155,9 @@ export function registerSearchCommand(program: Command, ctx: CliContext): void {
 
       // Fetch
       const browser = opts.browser as 'chrome' | 'firefox'
-      const { html, url } = await fetchHotelsHtml(query, browser)
+      const { html, url } = await withSpinner(ctx, 'Searching hotels', () =>
+        fetchHotelsHtml(query, browser),
+      )
       logVerbose(ctx, `Fetched ${(html.length / 1024).toFixed(0)}KB from Google Hotels`)
       logDebug(ctx, `URL: ${url}`)
 

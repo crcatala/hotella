@@ -39,7 +39,8 @@
     "cheerio": "^1.0.0",
     "commander": "^14.0.0",
     "impit": "^0.8.0",
-    "kleur": "^4.1.5"
+    "kleur": "^4.1.5",
+    "ora": "^9.1.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
