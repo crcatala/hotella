@@ -1,4 +1,4 @@
-# hotel-search-cli
+# hotella
 
 Search hotel prices and availability from the terminal via Google Hotels.
 

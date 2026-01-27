@@ -1,12 +1,12 @@
 {
-  "name": "hotel-search-cli",
+  "name": "hotella",
   "version": "0.1.0",
   "description": "Search hotel prices and availability from the terminal via Google Hotels",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "hotels": "dist/cli.js"
+    "hotella": "dist/cli.js"
   },
   "files": [
     "dist",

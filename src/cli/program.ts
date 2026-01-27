@@ -21,11 +21,11 @@ export function createProgram(ctx: CliContext): Command {
   program.addHelpText(
     'beforeAll',
     () =>
-      `${ctx.colors.banner('hotels')} ${ctx.colors.muted(`v${VERSION}`)} — ${ctx.colors.muted('Search hotel prices from the terminal')}\n`,
+      `${ctx.colors.banner('hotella')} ${ctx.colors.muted(`v${VERSION}`)} — ${ctx.colors.muted('Search hotel prices from the terminal')}\n`,
   )
 
   program
-    .name('hotels')
+    .name('hotella')
     .description('Search hotel prices and availability via Google Hotels')
     .version(VERSION)
     .action(() => {
