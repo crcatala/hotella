@@ -10,6 +10,22 @@ Started: 2026-01-27T23:20:21.958Z
 - `extractPrice` and `CURRENCY_SYMBOLS` are exported from `src/lib/parser.ts` for reuse and testing
 - EUR uses period as thousands separator (1.234 = 1234); other currencies use comma
 
+- Table formatter lives in `src/lib/table.ts` as pure functions, following the same pattern as filters
+- `OutputFormat` type in `src/cli/context.ts` controls format; `--table` detected in `createContext` argv parsing
+- `formatTableRow` and `formatTableOutput` are exported separately for unit testing
+
+---
+
+## [2026-01-27 15:32] - hot-8726
+- Implemented table output format with `--table` flag
+- Added `'table'` to `OutputFormat` type in `src/cli/context.ts`
+- Added `--table` option to global options in `src/cli/program.ts`
+- Created `src/lib/table.ts` with `formatTableRow` and `formatTableOutput` functions
+- Columns: Name (35), Price (8, right-aligned), Rating (6), Amenities (30+)
+- Truncation with ellipsis for long names/amenities; N/A for null price, `-` for null rating
+- Integrated into search command output path
+- Files changed: `src/cli/context.ts`, `src/cli/program.ts`, `src/commands/search.ts`, `src/lib/table.ts` (new), `tests/unit/table.test.ts` (new)
+- **Learnings:** Table format follows same header/summary structure as plain output for consistency
 ---
 
 ## [2026-01-27 15:30] - hot-8075

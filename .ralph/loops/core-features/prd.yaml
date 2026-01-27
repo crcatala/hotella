@@ -60,7 +60,7 @@ tasks:
 
   - id: hot-8726
     title: "Table output format (--table)"
-    status: pending
+    status: done
     acceptance:
       - "--table flag produces aligned columnar output"
       - "Columns: Name (35 chars), Price (8), Rating (6), Amenities (30+)"

@@ -6,6 +6,7 @@ import { fetchHotelsHtml } from '../lib/fetcher.js'
 import { filterByPrice, filterByRating } from '../lib/filters.js'
 import { CURRENCY_SYMBOLS, parseHotelsHtml } from '../lib/parser.js'
 import { type SortMode, sortHotels } from '../lib/sort.js'
+import { formatTableOutput } from '../lib/table.js'
 import type { Hotel, SearchQuery, SearchResult } from '../lib/types.js'
 
 const SUPPORTED_CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'TWD']
@@ -202,6 +203,8 @@ export function registerSearchCommand(program: Command, ctx: CliContext): void {
         output(JSON.stringify(result, null, 2))
       } else if (allFilteredOut) {
         output('No hotels match your filters.')
+      } else if (ctx.output.format === 'table') {
+        output(formatTableOutput(result))
       } else {
         output(formatPlainOutput(result))
       }
