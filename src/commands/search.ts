@@ -1,6 +1,6 @@
 import type { Command } from 'commander'
 import type { CliContext } from '../cli/context.js'
-import { UsageError } from '../cli/errors.js'
+import { ApiError, UsageError } from '../cli/errors.js'
 import { logDebug, logVerbose, output } from '../cli/output.js'
 import { fetchHotelsHtml } from '../lib/fetcher.js'
 import { filterByPrice, filterByRating } from '../lib/filters.js'
@@ -89,6 +89,14 @@ export function registerSearchCommand(program: Command, ctx: CliContext): void {
       const checkin = validateDate(opts.checkin, 'check-in')
       const checkout = validateDate(opts.checkout, 'check-out')
 
+      // Reject past dates
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const checkinDate = new Date(`${checkin}T00:00:00`)
+      if (checkinDate < today) {
+        throw new UsageError(`Check-in date ${checkin} is in the past. Use a future date.`)
+      }
+
       if (checkin >= checkout) {
         throw new UsageError('Check-out date must be after check-in date.')
       }
@@ -154,12 +162,23 @@ export function registerSearchCommand(program: Command, ctx: CliContext): void {
       let hotels = parseHotelsHtml(html, query.currency)
       logVerbose(ctx, `Parsed ${hotels.length} hotels`)
 
-      if (hotels.length === 0) {
+      if (hotels.length === 0 && html.length > 5000) {
+        // Non-empty HTML but no hotels parsed — likely a layout change
         logDebug(ctx, 'No hotel cards found. HTML may have changed structure.', {
           htmlLength: html.length,
           hasUaTTDe: html.includes('uaTTDe'),
           hasBgYkof: html.includes('BgYkof'),
         })
+        throw new ApiError(
+          'Failed to parse hotel data. Google may have changed their page layout. Try --debug for details.',
+        )
+      }
+
+      if (hotels.length === 0) {
+        output(
+          `No hotels found for "${resolvedLocation}". Try a different location or broader dates.`,
+        )
+        return
       }
 
       // Filter

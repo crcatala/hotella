@@ -18,6 +18,18 @@ Started: 2026-01-27T23:20:21.958Z
 
 ---
 
+## [2026-01-27 15:37] - hot-9387
+- Implemented improved user-friendly error messages
+- Past dates rejected with actionable message: "Check-in date YYYY-MM-DD is in the past. Use a future date."
+- Network errors wrapped with ApiError: "Failed to connect to Google Hotels. Check your internet connection."
+- Rate limiting (429 or short HTML) suggests waiting and retrying
+- Parse failure (0 hotels from non-empty HTML >5KB) shows: "Failed to parse hotel data... Try --debug for details."
+- No results shows: 'No hotels found for "X". Try a different location or broader dates.'
+- Fetcher errors wrapped with user-friendly ApiError messages
+- Files changed: `src/lib/fetcher.ts`, `src/commands/search.ts`, `tests/unit/errors.test.ts` (new)
+- **Learnings:** Fetcher already threw plain `Error`; replaced with `ApiError` imports from `../cli/errors.js`; network errors caught by wrapping the entire fetch call in try/catch
+---
+
 ## [2026-01-27 15:36] - hot-e7c5
 - Implemented IATA airport code → city resolution
 - Created `src/lib/iata.ts` with `resolveLocation()`, `parseAirportsCsv()`, `isIataCode()`, and `FALLBACK_AIRPORTS`

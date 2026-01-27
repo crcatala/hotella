@@ -106,7 +106,7 @@ tasks:
 
   - id: hot-9387
     title: "Improved user-friendly error messages"
-    status: pending
+    status: done
     acceptance:
       - "Past dates rejected with message: 'Check-in date YYYY-MM-DD is in the past. Use a future date.'"
       - "Network errors show: 'Failed to connect to Google Hotels. Check your internet connection.'"
