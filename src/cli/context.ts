@@ -1,6 +1,6 @@
 import kleur from 'kleur'
 
-export type OutputFormat = 'json' | 'plain'
+export type OutputFormat = 'json' | 'plain' | 'table'
 
 export type OutputConfig = {
   color: boolean
@@ -38,6 +38,7 @@ export function createContext(argv: string[], env: Record<string, string | undef
 
   let format: OutputFormat = isTty ? 'plain' : 'json'
   if (argv.includes('--json')) format = 'json'
+  else if (argv.includes('--table')) format = 'table'
   else if (argv.includes('--plain')) format = 'plain'
 
   const color = isTty && !noColor && format === 'plain'

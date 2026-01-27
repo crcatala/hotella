@@ -20,7 +20,7 @@ pre_commit: "pnpm run verify"
 tasks:
   - id: hot-a6e9
     title: "Client-side price and rating filters"
-    status: pending
+    status: done
     acceptance:
       - "--min-price, --max-price, --min-rating flags work correctly on the search command"
       - "Filters implemented in src/lib/filters.ts with filterByPrice and filterByRating functions"
@@ -41,7 +41,7 @@ tasks:
 
   - id: hot-8075
     title: "Multi-currency price parsing and --currency flag"
-    status: pending
+    status: done
     acceptance:
       - "--currency flag accepted with codes: USD, EUR, GBP, JPY, TWD (at minimum)"
       - "Currency passed to fetcher as 'curr' query param"
@@ -60,7 +60,7 @@ tasks:
 
   - id: hot-8726
     title: "Table output format (--table)"
-    status: pending
+    status: done
     acceptance:
       - "--table flag produces aligned columnar output"
       - "Columns: Name (35 chars), Price (8), Rating (6), Amenities (30+)"
@@ -82,7 +82,7 @@ tasks:
 
   - id: hot-e7c5
     title: "IATA airport code → city resolution"
-    status: pending
+    status: done
     acceptance:
       - "Airport codes like NRT, TPE, CDG resolve to city names"
       - "Implemented in src/lib/iata.ts with resolveLocation(input) function"
@@ -106,7 +106,7 @@ tasks:
 
   - id: hot-9387
     title: "Improved user-friendly error messages"
-    status: pending
+    status: done
     acceptance:
       - "Past dates rejected with message: 'Check-in date YYYY-MM-DD is in the past. Use a future date.'"
       - "Network errors show: 'Failed to connect to Google Hotels. Check your internet connection.'"

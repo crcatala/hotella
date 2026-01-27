@@ -36,6 +36,7 @@ export function createProgram(ctx: CliContext): Command {
   program
     .option('--json', 'Output as JSON')
     .option('--plain', 'Plain text output')
+    .option('--table', 'Aligned columnar table output')
     .option('--verbose', 'Show operational progress')
     .option('--debug', 'Show debug information (implies --verbose)')
     .option('--no-color', 'Disable colors')

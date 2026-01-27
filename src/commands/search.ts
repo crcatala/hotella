@@ -1,11 +1,17 @@
 import type { Command } from 'commander'
 import type { CliContext } from '../cli/context.js'
-import { UsageError } from '../cli/errors.js'
+import { ApiError, UsageError } from '../cli/errors.js'
 import { logDebug, logVerbose, output } from '../cli/output.js'
+import { withSpinner } from '../cli/spinner.js'
 import { fetchHotelsHtml } from '../lib/fetcher.js'
-import { parseHotelsHtml } from '../lib/parser.js'
+import { filterByPrice, filterByRating } from '../lib/filters.js'
+import { resolveLocation } from '../lib/iata.js'
+import { CURRENCY_SYMBOLS, parseHotelsHtml } from '../lib/parser.js'
 import { type SortMode, sortHotels } from '../lib/sort.js'
+import { formatTableOutput } from '../lib/table.js'
 import type { Hotel, SearchQuery, SearchResult } from '../lib/types.js'
+
+const SUPPORTED_CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'TWD']
 
 function validateDate(value: string, label: string): string {
   const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/)
@@ -42,7 +48,8 @@ function formatPlainOutput(result: SearchResult): string {
   for (let i = 0; i < hotels.length; i++) {
     const h = hotels[i]
     const num = `${(i + 1).toString().padStart(2)}.`
-    const priceStr = h.price !== null ? `$${h.price}/night` : 'Price N/A'
+    const sym = CURRENCY_SYMBOLS[query.currency] ?? query.currency + ' '
+    const priceStr = h.price !== null ? `${sym}${h.price}/night` : 'Price N/A'
     const ratingStr = h.rating !== null ? `★ ${h.rating}` : ''
     const amenityStr = h.amenities.length > 0 ? h.amenities.slice(0, 3).join(', ') : ''
 
@@ -53,7 +60,8 @@ function formatPlainOutput(result: SearchResult): string {
   }
 
   if (summary.lowestPrice !== null) {
-    lines.push(`Found ${summary.total} hotels · Lowest: $${summary.lowestPrice}/night`)
+    const sym = CURRENCY_SYMBOLS[query.currency] ?? query.currency + ' '
+    lines.push(`Found ${summary.total} hotels · Lowest: ${sym}${summary.lowestPrice}/night`)
   } else {
     lines.push(`Found ${summary.total} hotels`)
   }
@@ -72,11 +80,21 @@ export function registerSearchCommand(program: Command, ctx: CliContext): void {
     .option('--children <n>', 'Number of children (0-8)', '0')
     .option('--sort <mode>', 'Sort: price-asc, price-desc, rating, value', 'value')
     .option('--limit <n>', 'Max results to show', '20')
+    .option('--min-price <n>', 'Minimum price per night')
+    .option('--max-price <n>', 'Maximum price per night')
+    .option('--min-rating <n>', 'Minimum rating (0-5)')
+    .option('--currency <code>', 'Currency code: USD, EUR, GBP, JPY, TWD', 'USD')
     .option('--browser <type>', 'Browser to impersonate: chrome or firefox', 'chrome')
     .action(async (location: string, opts: Record<string, string>) => {
       // Validate dates
       const checkin = validateDate(opts.checkin, 'check-in')
       const checkout = validateDate(opts.checkout, 'check-out')
+
+      // Reject past dates (compare YYYY-MM-DD strings — lexicographic ordering is correct)
+      const todayStr = new Date().toISOString().slice(0, 10)
+      if (checkin < todayStr) {
+        throw new UsageError(`Check-in date ${checkin} is in the past. Use a future date.`)
+      }
 
       if (checkin >= checkout) {
         throw new UsageError('Check-out date must be after check-in date.')
@@ -106,21 +124,40 @@ export function registerSearchCommand(program: Command, ctx: CliContext): void {
         throw new UsageError('Limit must be a positive number.')
       }
 
+      // Validate currency
+      const currency = opts.currency.toUpperCase()
+      if (!SUPPORTED_CURRENCIES.includes(currency)) {
+        throw new UsageError(
+          `Unsupported currency "${opts.currency}". Use: ${SUPPORTED_CURRENCIES.join(', ')}`,
+        )
+      }
+
+      // Resolve IATA airport codes to city names
+      const locationResult = await withSpinner(ctx, 'Resolving location', () =>
+        resolveLocation(location),
+      )
+      const resolvedLocation = locationResult.resolved
+      if (locationResult.wasIata) {
+        logVerbose(ctx, `Resolving location "${locationResult.original}" → "${resolvedLocation}"`)
+      }
+
       const query: SearchQuery = {
-        location,
+        location: resolvedLocation,
         checkin,
         checkout,
         adults,
         children,
-        currency: 'USD',
+        currency,
       }
 
-      logVerbose(ctx, `Searching hotels in "${location}"...`)
+      logVerbose(ctx, `Searching hotels in "${resolvedLocation}"...`)
       logDebug(ctx, 'Search query:', query)
 
       // Fetch
       const browser = opts.browser as 'chrome' | 'firefox'
-      const { html, url } = await fetchHotelsHtml(query, browser)
+      const { html, url } = await withSpinner(ctx, 'Searching hotels', () =>
+        fetchHotelsHtml(query, browser),
+      )
       logVerbose(ctx, `Fetched ${(html.length / 1024).toFixed(0)}KB from Google Hotels`)
       logDebug(ctx, `URL: ${url}`)
 
@@ -128,13 +165,50 @@ export function registerSearchCommand(program: Command, ctx: CliContext): void {
       let hotels = parseHotelsHtml(html, query.currency)
       logVerbose(ctx, `Parsed ${hotels.length} hotels`)
 
-      if (hotels.length === 0) {
+      if (hotels.length === 0 && html.length > 5000) {
+        // Non-empty HTML but no hotels parsed — likely a layout change
         logDebug(ctx, 'No hotel cards found. HTML may have changed structure.', {
           htmlLength: html.length,
           hasUaTTDe: html.includes('uaTTDe'),
           hasBgYkof: html.includes('BgYkof'),
         })
+        throw new ApiError(
+          'Failed to parse hotel data. Google may have changed their page layout. Try --debug for details.',
+        )
       }
+
+      if (hotels.length === 0) {
+        output(
+          `No hotels found for "${resolvedLocation}". Try a different location or broader dates.`,
+        )
+        return
+      }
+
+      // Filter
+      const totalBeforeFilter = hotels.length
+      const minPrice = opts.minPrice !== undefined ? Number.parseFloat(opts.minPrice) : undefined
+      const maxPrice = opts.maxPrice !== undefined ? Number.parseFloat(opts.maxPrice) : undefined
+      const minRating = opts.minRating !== undefined ? Number.parseFloat(opts.minRating) : undefined
+
+      if (minPrice !== undefined && (Number.isNaN(minPrice) || minPrice < 0)) {
+        throw new UsageError('--min-price must be a non-negative number.')
+      }
+      if (maxPrice !== undefined && (Number.isNaN(maxPrice) || maxPrice < 0)) {
+        throw new UsageError('--max-price must be a non-negative number.')
+      }
+      if (minRating !== undefined && (Number.isNaN(minRating) || minRating < 0 || minRating > 5)) {
+        throw new UsageError('--min-rating must be between 0 and 5.')
+      }
+
+      hotels = filterByPrice(hotels, { minPrice, maxPrice })
+      hotels = filterByRating(hotels, { minRating })
+
+      if (totalBeforeFilter > 0 && hotels.length < totalBeforeFilter) {
+        logVerbose(ctx, `Filtered: ${hotels.length} of ${totalBeforeFilter} hotels match criteria`)
+      }
+
+      const hasFilters = minPrice !== undefined || maxPrice !== undefined || minRating !== undefined
+      const allFilteredOut = hasFilters && totalBeforeFilter > 0 && hotels.length === 0
 
       // Sort
       hotels = sortHotels(hotels, opts.sort as SortMode)
@@ -155,8 +229,16 @@ export function registerSearchCommand(program: Command, ctx: CliContext): void {
       }
 
       // Output
-      if (ctx.output.format === 'json') {
+      if (allFilteredOut) {
+        if (ctx.output.format === 'json') {
+          output(JSON.stringify(result, null, 2))
+        } else {
+          output('No hotels match your filters.')
+        }
+      } else if (ctx.output.format === 'json') {
         output(JSON.stringify(result, null, 2))
+      } else if (ctx.output.format === 'table') {
+        output(formatTableOutput(result))
       } else {
         output(formatPlainOutput(result))
       }
