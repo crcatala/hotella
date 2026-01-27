@@ -4,6 +4,7 @@ import { UsageError } from '../cli/errors.js'
 import { logDebug, logVerbose, output } from '../cli/output.js'
 import { fetchHotelsHtml } from '../lib/fetcher.js'
 import { filterByPrice, filterByRating } from '../lib/filters.js'
+import { resolveLocation } from '../lib/iata.js'
 import { CURRENCY_SYMBOLS, parseHotelsHtml } from '../lib/parser.js'
 import { type SortMode, sortHotels } from '../lib/sort.js'
 import { formatTableOutput } from '../lib/table.js'
@@ -124,8 +125,15 @@ export function registerSearchCommand(program: Command, ctx: CliContext): void {
         )
       }
 
+      // Resolve IATA airport codes to city names
+      const locationResult = await resolveLocation(location)
+      const resolvedLocation = locationResult.resolved
+      if (locationResult.wasIata) {
+        logVerbose(ctx, `Resolving location "${locationResult.original}" → "${resolvedLocation}"`)
+      }
+
       const query: SearchQuery = {
-        location,
+        location: resolvedLocation,
         checkin,
         checkout,
         adults,
@@ -133,7 +141,7 @@ export function registerSearchCommand(program: Command, ctx: CliContext): void {
         currency,
       }
 
-      logVerbose(ctx, `Searching hotels in "${location}"...`)
+      logVerbose(ctx, `Searching hotels in "${resolvedLocation}"...`)
       logDebug(ctx, 'Search query:', query)
 
       // Fetch

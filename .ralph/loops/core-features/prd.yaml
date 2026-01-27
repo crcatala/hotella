@@ -82,7 +82,7 @@ tasks:
 
   - id: hot-e7c5
     title: "IATA airport code → city resolution"
-    status: pending
+    status: done
     acceptance:
       - "Airport codes like NRT, TPE, CDG resolve to city names"
       - "Implemented in src/lib/iata.ts with resolveLocation(input) function"
