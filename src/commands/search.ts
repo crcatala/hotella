@@ -3,6 +3,7 @@ import type { CliContext } from '../cli/context.js'
 import { UsageError } from '../cli/errors.js'
 import { logDebug, logVerbose, output } from '../cli/output.js'
 import { fetchHotelsHtml } from '../lib/fetcher.js'
+import { filterByPrice, filterByRating } from '../lib/filters.js'
 import { parseHotelsHtml } from '../lib/parser.js'
 import { type SortMode, sortHotels } from '../lib/sort.js'
 import type { Hotel, SearchQuery, SearchResult } from '../lib/types.js'
@@ -72,6 +73,9 @@ export function registerSearchCommand(program: Command, ctx: CliContext): void {
     .option('--children <n>', 'Number of children (0-8)', '0')
     .option('--sort <mode>', 'Sort: price-asc, price-desc, rating, value', 'value')
     .option('--limit <n>', 'Max results to show', '20')
+    .option('--min-price <n>', 'Minimum price per night')
+    .option('--max-price <n>', 'Maximum price per night')
+    .option('--min-rating <n>', 'Minimum rating (0-5)')
     .option('--browser <type>', 'Browser to impersonate: chrome or firefox', 'chrome')
     .action(async (location: string, opts: Record<string, string>) => {
       // Validate dates
@@ -136,6 +140,32 @@ export function registerSearchCommand(program: Command, ctx: CliContext): void {
         })
       }
 
+      // Filter
+      const totalBeforeFilter = hotels.length
+      const minPrice = opts.minPrice !== undefined ? Number.parseFloat(opts.minPrice) : undefined
+      const maxPrice = opts.maxPrice !== undefined ? Number.parseFloat(opts.maxPrice) : undefined
+      const minRating = opts.minRating !== undefined ? Number.parseFloat(opts.minRating) : undefined
+
+      if (minPrice !== undefined && (Number.isNaN(minPrice) || minPrice < 0)) {
+        throw new UsageError('--min-price must be a non-negative number.')
+      }
+      if (maxPrice !== undefined && (Number.isNaN(maxPrice) || maxPrice < 0)) {
+        throw new UsageError('--max-price must be a non-negative number.')
+      }
+      if (minRating !== undefined && (Number.isNaN(minRating) || minRating < 0 || minRating > 5)) {
+        throw new UsageError('--min-rating must be between 0 and 5.')
+      }
+
+      hotels = filterByPrice(hotels, { minPrice, maxPrice })
+      hotels = filterByRating(hotels, { minRating })
+
+      if (totalBeforeFilter > 0 && hotels.length < totalBeforeFilter) {
+        logVerbose(ctx, `Filtered: ${hotels.length} of ${totalBeforeFilter} hotels match criteria`)
+      }
+
+      const hasFilters = minPrice !== undefined || maxPrice !== undefined || minRating !== undefined
+      const allFilteredOut = hasFilters && totalBeforeFilter > 0 && hotels.length === 0
+
       // Sort
       hotels = sortHotels(hotels, opts.sort as SortMode)
 
@@ -157,6 +187,8 @@ export function registerSearchCommand(program: Command, ctx: CliContext): void {
       // Output
       if (ctx.output.format === 'json') {
         output(JSON.stringify(result, null, 2))
+      } else if (allFilteredOut) {
+        output('No hotels match your filters.')
       } else {
         output(formatPlainOutput(result))
       }

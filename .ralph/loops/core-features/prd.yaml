@@ -20,7 +20,7 @@ pre_commit: "pnpm run verify"
 tasks:
   - id: hot-a6e9
     title: "Client-side price and rating filters"
-    status: pending
+    status: done
     acceptance:
       - "--min-price, --max-price, --min-rating flags work correctly on the search command"
       - "Filters implemented in src/lib/filters.ts with filterByPrice and filterByRating functions"
