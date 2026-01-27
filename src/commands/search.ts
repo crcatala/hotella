@@ -4,9 +4,11 @@ import { UsageError } from '../cli/errors.js'
 import { logDebug, logVerbose, output } from '../cli/output.js'
 import { fetchHotelsHtml } from '../lib/fetcher.js'
 import { filterByPrice, filterByRating } from '../lib/filters.js'
-import { parseHotelsHtml } from '../lib/parser.js'
+import { CURRENCY_SYMBOLS, parseHotelsHtml } from '../lib/parser.js'
 import { type SortMode, sortHotels } from '../lib/sort.js'
 import type { Hotel, SearchQuery, SearchResult } from '../lib/types.js'
+
+const SUPPORTED_CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'TWD']
 
 function validateDate(value: string, label: string): string {
   const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/)
@@ -43,7 +45,8 @@ function formatPlainOutput(result: SearchResult): string {
   for (let i = 0; i < hotels.length; i++) {
     const h = hotels[i]
     const num = `${(i + 1).toString().padStart(2)}.`
-    const priceStr = h.price !== null ? `$${h.price}/night` : 'Price N/A'
+    const sym = CURRENCY_SYMBOLS[query.currency] ?? query.currency + ' '
+    const priceStr = h.price !== null ? `${sym}${h.price}/night` : 'Price N/A'
     const ratingStr = h.rating !== null ? `★ ${h.rating}` : ''
     const amenityStr = h.amenities.length > 0 ? h.amenities.slice(0, 3).join(', ') : ''
 
@@ -54,7 +57,8 @@ function formatPlainOutput(result: SearchResult): string {
   }
 
   if (summary.lowestPrice !== null) {
-    lines.push(`Found ${summary.total} hotels · Lowest: $${summary.lowestPrice}/night`)
+    const sym = CURRENCY_SYMBOLS[query.currency] ?? query.currency + ' '
+    lines.push(`Found ${summary.total} hotels · Lowest: ${sym}${summary.lowestPrice}/night`)
   } else {
     lines.push(`Found ${summary.total} hotels`)
   }
@@ -76,6 +80,7 @@ export function registerSearchCommand(program: Command, ctx: CliContext): void {
     .option('--min-price <n>', 'Minimum price per night')
     .option('--max-price <n>', 'Maximum price per night')
     .option('--min-rating <n>', 'Minimum rating (0-5)')
+    .option('--currency <code>', 'Currency code: USD, EUR, GBP, JPY, TWD', 'USD')
     .option('--browser <type>', 'Browser to impersonate: chrome or firefox', 'chrome')
     .action(async (location: string, opts: Record<string, string>) => {
       // Validate dates
@@ -110,13 +115,21 @@ export function registerSearchCommand(program: Command, ctx: CliContext): void {
         throw new UsageError('Limit must be a positive number.')
       }
 
+      // Validate currency
+      const currency = opts.currency.toUpperCase()
+      if (!SUPPORTED_CURRENCIES.includes(currency)) {
+        throw new UsageError(
+          `Unsupported currency "${opts.currency}". Use: ${SUPPORTED_CURRENCIES.join(', ')}`,
+        )
+      }
+
       const query: SearchQuery = {
         location,
         checkin,
         checkout,
         adults,
         children,
-        currency: 'USD',
+        currency,
       }
 
       logVerbose(ctx, `Searching hotels in "${location}"...`)

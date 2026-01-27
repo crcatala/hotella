@@ -41,7 +41,7 @@ tasks:
 
   - id: hot-8075
     title: "Multi-currency price parsing and --currency flag"
-    status: pending
+    status: done
     acceptance:
       - "--currency flag accepted with codes: USD, EUR, GBP, JPY, TWD (at minimum)"
       - "Currency passed to fetcher as 'curr' query param"
