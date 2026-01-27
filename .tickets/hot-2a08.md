@@ -1,7 +1,7 @@
 ---
 id: hot-2a08
 status: open
-deps: [hot-8726]
+deps: [hot-8726, hot-2758]
 links: []
 created: 2026-01-27T21:51:54Z
 type: task

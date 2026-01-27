@@ -42,7 +42,7 @@ export function parseHotelsHtml(html: string, currency: string): Hotel[] {
   const hotels: Hotel[] = []
 
   // Primary selector for hotel cards
-  $('div.uaTTDe').each((_: number, card: cheerio.Element) => {
+  $('div.uaTTDe').each((_i, card) => {
     const $card = $(card)
 
     // Name
@@ -73,7 +73,7 @@ export function parseHotelsHtml(html: string, currency: string): Hotel[] {
 
     // Amenities
     const amenities: string[] = []
-    $card.find('span.LtjZ2d').each((_: number, el: cheerio.Element) => {
+    $card.find('span.LtjZ2d').each((_i, el) => {
       const text = $(el).text().trim()
       if (text.length > 2 && !amenities.includes(text)) {
         amenities.push(text)

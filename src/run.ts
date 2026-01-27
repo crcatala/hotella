@@ -9,10 +9,7 @@ export type RunEnv = {
   stderr: NodeJS.WritableStream
 }
 
-export async function runCli(
-  argv: string[],
-  { env, stdout, stderr }: RunEnv,
-): Promise<void> {
+export async function runCli(argv: string[], { env, stdout, stderr }: RunEnv): Promise<void> {
   setOutputStream(stdout, stderr)
 
   const ctx = createContext(argv, env)

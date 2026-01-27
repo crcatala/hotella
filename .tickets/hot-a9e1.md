@@ -1,7 +1,7 @@
 ---
 id: hot-a9e1
 status: open
-deps: []
+deps: [hot-2758]
 links: []
 created: 2026-01-27T21:52:17Z
 type: feature

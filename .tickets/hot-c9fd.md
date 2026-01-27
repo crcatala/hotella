@@ -1,7 +1,7 @@
 ---
 id: hot-c9fd
 status: open
-deps: [hot-8075, hot-a6e9, hot-8726, hot-e7c5]
+deps: [hot-8075, hot-a6e9, hot-8726, hot-e7c5, hot-2758]
 links: []
 created: 2026-01-27T21:51:54Z
 type: task

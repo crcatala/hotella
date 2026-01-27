@@ -1,7 +1,7 @@
 ---
 id: hot-e7c5
 status: open
-deps: []
+deps: [hot-2758]
 links: []
 created: 2026-01-27T21:51:13Z
 type: feature

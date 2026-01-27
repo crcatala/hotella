@@ -1,7 +1,7 @@
 ---
 id: hot-61bb
 status: open
-deps: [hot-c9fd]
+deps: [hot-c9fd, hot-2758]
 links: []
 created: 2026-01-27T21:52:17Z
 type: feature

@@ -10,7 +10,9 @@ import type { Hotel, SearchQuery, SearchResult } from '../lib/types.js'
 function validateDate(value: string, label: string): string {
   const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/)
   if (!match) {
-    throw new UsageError(`Invalid ${label} date "${value}". Use YYYY-MM-DD format (e.g., 2026-02-10).`)
+    throw new UsageError(
+      `Invalid ${label} date "${value}". Use YYYY-MM-DD format (e.g., 2026-02-10).`,
+    )
   }
   const date = new Date(`${value}T00:00:00`)
   if (Number.isNaN(date.getTime())) {
@@ -96,9 +98,7 @@ export function registerSearchCommand(program: Command, ctx: CliContext): void {
       // Validate sort
       const validSorts: SortMode[] = ['price-asc', 'price-desc', 'rating', 'value']
       if (!validSorts.includes(opts.sort as SortMode)) {
-        throw new UsageError(
-          `Invalid sort mode "${opts.sort}". Use: ${validSorts.join(', ')}`,
-        )
+        throw new UsageError(`Invalid sort mode "${opts.sort}". Use: ${validSorts.join(', ')}`)
       }
 
       const limit = Number.parseInt(opts.limit, 10)
