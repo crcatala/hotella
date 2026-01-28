@@ -1,12 +1,11 @@
 import { execFile } from 'node:child_process'
 import { join } from 'node:path'
 import { promisify } from 'node:util'
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 
 const execFileAsync = promisify(execFile)
-const CLI_PATH = join(__dirname, '..', '..', 'src', 'cli.ts')
-const TSX = 'npx'
-const TSX_ARGS = ['tsx', CLI_PATH]
+const PROJECT_DIR = join(__dirname, '..', '..')
+const CLI_PATH = join(PROJECT_DIR, 'dist', 'cli.js')
 
 interface ExecResult {
   stdout: string
@@ -14,10 +13,16 @@ interface ExecResult {
   exitCode: number
 }
 
+// Build once before all integration tests so we run against compiled JS (fast)
+// instead of npx tsx (slow ~1.4s startup per invocation).
+beforeAll(async () => {
+  await execFileAsync('npx', ['tsgo'], { cwd: PROJECT_DIR, timeout: 30_000 })
+}, 30_000)
+
 async function runCli(args: string[]): Promise<ExecResult> {
   try {
-    const { stdout, stderr } = await execFileAsync(TSX, [...TSX_ARGS, ...args], {
-      timeout: 15_000,
+    const { stdout, stderr } = await execFileAsync('node', [CLI_PATH, ...args], {
+      timeout: 10_000,
       env: { ...process.env, NO_COLOR: '1' },
     })
     return { stdout, stderr, exitCode: 0 }
@@ -37,6 +42,14 @@ async function runCli(args: string[]): Promise<ExecResult> {
 }
 
 describe('CLI integration', () => {
+  describe('--version', () => {
+    it('exits with code 0 and shows version', async () => {
+      const result = await runCli(['--version'])
+      expect(result.exitCode).toBe(0)
+      expect(result.stdout.trim()).toMatch(/^\d+\.\d+\.\d+$/)
+    })
+  })
+
   describe('--help', () => {
     it('exits with code 0 and shows help', async () => {
       const result = await runCli(['--help'])

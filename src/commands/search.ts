@@ -1,6 +1,7 @@
 import type { Command } from 'commander'
 import type { CliContext } from '../cli/context.js'
 import { ApiError, UsageError } from '../cli/errors.js'
+import { formatHelpFooter, formatSharedExamples } from '../cli/help.js'
 import { logDebug, logVerbose, output } from '../cli/output.js'
 import { withSpinner } from '../cli/spinner.js'
 import { fetchHotelsHtml } from '../lib/fetcher.js'
@@ -86,7 +87,7 @@ export function registerSearchCommand(program: Command, ctx: CliContext): void {
     .option('--currency <code>', 'Currency code: USD, EUR, GBP, JPY, TWD', 'USD')
     .option('--browser <type>', 'Browser to impersonate: chrome or firefox', 'chrome')
 
-  searchCmd.addHelpText('afterAll', () => {
+  searchCmd.addHelpText('after', () => {
     const cmd = ctx.colors.command
     const dim = ctx.colors.muted
 
@@ -94,17 +95,7 @@ export function registerSearchCommand(program: Command, ctx: CliContext): void {
       '',
       ctx.colors.section('Examples:'),
       '',
-      `  ${cmd('hotella search "Taipei" --checkin 2026-02-10 --checkout 2026-02-17')}`,
-      `  ${dim('Search hotels in Taipei for a week')}`,
-      '',
-      `  ${cmd('hotella search "Tokyo" --checkin 2026-03-01 --checkout 2026-03-05 --sort price-asc --limit 5')}`,
-      `  ${dim('Cheapest 5 hotels in Tokyo')}`,
-      '',
-      `  ${cmd('hotella search "NRT" --checkin 2026-06-01 --checkout 2026-06-07')}`,
-      `  ${dim('Search using airport code (IATA → city resolution)')}`,
-      '',
-      `  ${cmd('hotella search "Paris" --checkin 2026-04-01 --checkout 2026-04-03 --json | jq')}`,
-      `  ${dim('JSON output for scripting')}`,
+      ...formatSharedExamples(cmd, dim),
       '',
       `  ${cmd('hotella search "London" --checkin 2026-05-01 --checkout 2026-05-03 --min-rating 4 --max-price 200')}`,
       `  ${dim('Filter by rating and price')}`,
@@ -112,16 +103,7 @@ export function registerSearchCommand(program: Command, ctx: CliContext): void {
       `  ${cmd('hotella search "Berlin" --checkin 2026-06-01 --checkout 2026-06-05 --currency EUR --table')}`,
       `  ${dim('Euro prices in table format')}`,
       '',
-      ctx.colors.section('Output Formats:'),
-      '',
-      `  ${cmd('--plain')}   ${dim('Human-readable list (default in TTY)')}`,
-      `  ${cmd('--json')}    ${dim('Structured JSON (default in pipes)')}`,
-      `  ${cmd('--table')}   ${dim('Aligned columnar table')}`,
-      '',
-      ctx.colors.section('Environment Variables:'),
-      '',
-      `  ${cmd('NO_COLOR')}  ${dim('Disable all color output (see https://no-color.org)')}`,
-      '',
+      ...formatHelpFooter(ctx.colors.section, cmd, dim),
     ].join('\n')
   })
 

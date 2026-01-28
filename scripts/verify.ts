@@ -55,7 +55,7 @@ const checks: CheckConfig[] = [
   },
   {
     name: 'Typecheck',
-    command: ['npx', 'tsc', '--noEmit'],
+    command: ['npx', 'tsgo', '--noEmit'],
     verboseHint: 'pnpm run typecheck:verbose',
   },
   {
