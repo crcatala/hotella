@@ -31,7 +31,7 @@ tasks:
   # ── Phase 1: Foundation (no dependencies) ─────────────────────────────
   - id: hot-b5cc
     title: "Add LICENSE file"
-    status: pending
+    status: done
     acceptance:
       - "MIT LICENSE file exists at repo root"
       - "Copyright year is 2026, copyright holder matches git remote owner"
