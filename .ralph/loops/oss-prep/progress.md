@@ -68,3 +68,12 @@ Started: 2026-01-27T23:36:06.388Z
 - Files changed: .github/workflows/ci.yml
 - **Learnings:** Use git ls-remote --tags to lookup SHAs; for annotated tags, the ^{} entry is the actual commit
 ---
+
+## [2026-01-28 08:06] - hot-9fcd
+- Created .github/workflows/secret-scan.yml for secret scanning on PRs and pushes to main
+- Uses gitleaks/gitleaks-action for detecting secrets in code
+- Action pinned to SHA ff98106e4c7b2bc287b24eaf42907196329070c7 (v2.3.9) with version comment
+- Includes checkout with fetch-depth: 0 for full history scanning
+- Files changed: .github/workflows/secret-scan.yml (new)
+- **Learnings:** Gitleaks requires fetch-depth: 0 for proper scanning of git history
+---

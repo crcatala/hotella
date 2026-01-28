@@ -150,7 +150,7 @@ tasks:
 
   - id: hot-9fcd
     title: "Add secret scanning to CI"
-    status: pending
+    status: done
     acceptance:
       - ".github/workflows/secret-scan.yml exists"
       - "Uses gitleaks/gitleaks-action (preferred) or equivalent"
