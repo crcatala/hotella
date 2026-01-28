@@ -164,7 +164,7 @@ tasks:
 
   - id: hot-ba0c
     title: "Add CODEOWNERS for workflow protection"
-    status: pending
+    status: done
     acceptance:
       - ".github/CODEOWNERS file exists"
       - "/.github/workflows/ directory is owned by @crcatala"

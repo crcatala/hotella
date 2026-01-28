@@ -77,3 +77,11 @@ Started: 2026-01-27T23:36:06.388Z
 - Files changed: .github/workflows/secret-scan.yml (new)
 - **Learnings:** Gitleaks requires fetch-depth: 0 for proper scanning of git history
 ---
+
+## [2026-01-28 08:07] - hot-ba0c
+- Created .github/CODEOWNERS file for workflow protection
+- Added rule: /.github/workflows/ owned by @crcatala
+- Follows GitHub CODEOWNERS syntax with documentation link
+- Files changed: .github/CODEOWNERS (new)
+- **Learnings:** CODEOWNERS path patterns use leading slash for repo root; simple one-rule file is sufficient for workflow protection
+---

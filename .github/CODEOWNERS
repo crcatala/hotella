@@ -1,0 +1,6 @@
+# CODEOWNERS - GitHub Workflow Protection
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Protect CI/CD workflows from unauthorized changes
+# Changes to workflow files require review from the repository owner
+/.github/workflows/ @crcatala
