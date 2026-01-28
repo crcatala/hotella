@@ -55,7 +55,8 @@
     "verify": "npx tsx scripts/verify.ts",
     "verify:verbose": "VERBOSE=1 npx tsx scripts/verify.ts",
     "prepare": "lefthook install || true",
-    "prepublishOnly": "pnpm run verify && pnpm run build"
+    "prepublishOnly": "pnpm run verify && pnpm run build",
+    "release": "release-it"
   },
   "dependencies": {
     "cheerio": "^1.0.0",
@@ -65,11 +66,13 @@
     "ora": "^9.1.0"
   },
   "devDependencies": {
+    "@release-it/keep-a-changelog": "^7.0.0",
     "@types/node": "^22.0.0",
     "@typescript/native-preview": "7.0.0-dev.20260127.1",
     "lefthook": "^2.0.16",
     "oxlint": "^1.42.0",
     "prettier": "^3.8.1",
+    "release-it": "^19.2.4",
     "tasuku": "^2.0.5",
     "tsx": "^4.0.0",
     "typescript": "^5.5.0",

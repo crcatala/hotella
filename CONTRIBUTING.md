@@ -75,4 +75,25 @@ Run `pnpm format` to auto-fix formatting issues before committing.
 
 ## Release Process
 
-Releases are automated via [release-it](https://github.com/release-it/release-it). See `.release-it.json` for configuration. Maintainers run `pnpm release` to publish new versions.
+Releases are automated via [release-it](https://github.com/release-it/release-it).
+
+**What happens on release:**
+
+1. `pnpm run verify` runs all quality checks
+2. Version is bumped in `package.json`
+3. `CHANGELOG.md` is updated with the release date
+4. Changes are committed and tagged
+5. A GitHub release is created
+6. Package is published to npm
+
+**For maintainers:**
+
+```bash
+# Dry run (no changes made)
+pnpm release -- --dry-run
+
+# Publish a release
+pnpm release
+```
+
+See `.release-it.json` for configuration details.

@@ -177,7 +177,7 @@ tasks:
   # ── Phase 4: Release automation (depends on CHANGELOG + CONTRIBUTING) ─
   - id: hot-c4c6
     title: "Add release-it for automated releases"
-    status: pending
+    status: done
     acceptance:
       - "release-it and @release-it/keep-a-changelog installed as devDependencies"
       - ".release-it.json config exists with git, github, npm, hooks, and plugin sections"

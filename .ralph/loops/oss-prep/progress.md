@@ -85,3 +85,16 @@ Started: 2026-01-27T23:36:06.388Z
 - Files changed: .github/CODEOWNERS (new)
 - **Learnings:** CODEOWNERS path patterns use leading slash for repo root; simple one-rule file is sufficient for workflow protection
 ---
+
+## [2026-01-28 08:10] - hot-c4c6
+- Installed release-it and @release-it/keep-a-changelog as devDependencies
+- Created .release-it.json config with git, github, npm, hooks, and plugins sections
+- Added "release" script to package.json
+- Configured hooks: before:init runs verify, after:bump runs build
+- Configured keep-a-changelog plugin for CHANGELOG.md
+- Set git.requireBranch to main, npm.publishArgs includes --access public
+- Added npm.skipChecks to allow dry-run without npm login (actual publish still requires auth)
+- Updated CONTRIBUTING.md with detailed release process section
+- Files changed: package.json, pnpm-lock.yaml, .release-it.json (new), CONTRIBUTING.md
+- **Learnings:** release-it dry-run validates preconditions (main branch, clean working dir) before simulating release; npm.skipChecks bypasses whoami check but publish still requires auth
+---
