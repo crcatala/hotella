@@ -11,3 +11,9 @@ parent: hot-fe21
 ---
 # Final verification and npm publish
 
+
+## Notes
+
+**2026-01-28T15:53:47Z**
+
+Package is scoped (@crcatala/hotella) — verify npx @crcatala/hotella works after publish
