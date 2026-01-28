@@ -1,9 +1,12 @@
+import { createRequire } from 'node:module'
 import { Command, Option } from 'commander'
 import { registerSearchCommand } from '../commands/search.js'
 import type { CliContext } from './context.js'
 import { formatHelpFooter, formatSharedExamples } from './help.js'
 
-const VERSION = '0.1.0'
+const require = createRequire(import.meta.url)
+const pkg = require('../../package.json') as { version: string }
+const VERSION = pkg.version
 
 export function createProgram(ctx: CliContext): Command {
   const program = new Command()

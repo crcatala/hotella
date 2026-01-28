@@ -31,7 +31,7 @@ tasks:
   # ── Phase 1: Foundation (no dependencies) ─────────────────────────────
   - id: hot-b5cc
     title: "Add LICENSE file"
-    status: pending
+    status: done
     acceptance:
       - "MIT LICENSE file exists at repo root"
       - "Copyright year is 2026, copyright holder matches git remote owner"
@@ -43,7 +43,7 @@ tasks:
 
   - id: hot-cdde
     title: "Package.json cleanup for npm publish"
-    status: pending
+    status: done
     acceptance:
       - "\"repository\" field points to github.com/crcatala/hotella (infer from git remote)"
       - "\"homepage\" field set (GitHub repo URL)"
@@ -62,7 +62,7 @@ tasks:
 
   - id: hot-1d37
     title: "Dynamic version from package.json"
-    status: pending
+    status: done
     acceptance:
       - "No hardcoded version string in src/cli/program.ts"
       - "Version is read from package.json at build time or runtime"
@@ -80,7 +80,7 @@ tasks:
 
   - id: hot-81cd
     title: "Add CHANGELOG.md"
-    status: pending
+    status: done
     acceptance:
       - "CHANGELOG.md exists at repo root"
       - "Follows Keep a Changelog format (https://keepachangelog.com/)"
@@ -96,7 +96,7 @@ tasks:
   # ── Phase 2: Docs + CI (depend on package.json) ──────────────────────
   - id: hot-605d
     title: "Add CONTRIBUTING.md"
-    status: pending
+    status: done
     acceptance:
       - "CONTRIBUTING.md exists at repo root"
       - "Covers prerequisites: Node 22+, pnpm"
@@ -115,7 +115,7 @@ tasks:
 
   - id: hot-9e30
     title: "Add CI workflow for PRs and pushes"
-    status: pending
+    status: done
     acceptance:
       - ".github/workflows/ci.yml exists"
       - "Triggers on push to main and pull_request to main"
@@ -135,7 +135,7 @@ tasks:
   # ── Phase 3: Security hardening (depend on CI) ───────────────────────
   - id: hot-995a
     title: "Pin GitHub Actions to SHA commits"
-    status: pending
+    status: done
     acceptance:
       - "All uses: lines in .github/workflows/*.yml reference full SHA commits"
       - "Each SHA line has a comment indicating the human-readable version (e.g., # v4.2.2)"
@@ -150,7 +150,7 @@ tasks:
 
   - id: hot-9fcd
     title: "Add secret scanning to CI"
-    status: pending
+    status: done
     acceptance:
       - ".github/workflows/secret-scan.yml exists"
       - "Uses gitleaks/gitleaks-action (preferred) or equivalent"
@@ -164,7 +164,7 @@ tasks:
 
   - id: hot-ba0c
     title: "Add CODEOWNERS for workflow protection"
-    status: pending
+    status: done
     acceptance:
       - ".github/CODEOWNERS file exists"
       - "/.github/workflows/ directory is owned by @crcatala"
@@ -177,7 +177,7 @@ tasks:
   # ── Phase 4: Release automation (depends on CHANGELOG + CONTRIBUTING) ─
   - id: hot-c4c6
     title: "Add release-it for automated releases"
-    status: pending
+    status: done
     acceptance:
       - "release-it and @release-it/keep-a-changelog installed as devDependencies"
       - ".release-it.json config exists with git, github, npm, hooks, and plugin sections"
