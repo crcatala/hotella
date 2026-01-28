@@ -33,3 +33,11 @@ Started: 2026-01-27T23:20:22.132Z
 - Files changed: `src/cli/program.ts`, `src/commands/search.ts`
 - **Learnings:** Commander's `afterAll` propagates to subcommand help output. Use `after` on the parent program to keep help text scoped to that command only.
 ---
+
+## [2026-01-27 16:06] - hot-2561
+- Rewrote README.md with comprehensive content covering all CLI features
+- Sections: project description, quick start, installation, usage examples, full CLI reference, output format examples, how it works, known limitations, development guide, project structure, contributing, license
+- Examples cover: basic search, sort/limit, IATA codes, filters, currency, JSON piping, table output
+- Files changed: `README.md`
+- **Learnings:** The existing README had outdated "Future enhancements" referencing features already implemented (table, currency, filters, IATA). Always check current CLI --help output for ground truth.
+---

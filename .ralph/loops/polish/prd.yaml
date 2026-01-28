@@ -74,7 +74,7 @@ tasks:
 
   - id: hot-2561
     title: "Comprehensive README with install instructions and examples"
-    status: pending
+    status: done
     acceptance:
       - "README covers: project description and motivation"
       - "Installation section: pnpm install, npm install, npx usage"
