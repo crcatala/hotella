@@ -48,7 +48,7 @@ tasks:
 
   - id: hot-2a08
     title: "Rich help text with examples"
-    status: pending
+    status: done
     acceptance:
       - "hotella --help shows common usage examples with descriptions"
       - "hotella search --help shows search-specific examples"

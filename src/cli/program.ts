@@ -41,6 +41,39 @@ export function createProgram(ctx: CliContext): Command {
     .option('--debug', 'Show debug information (implies --verbose)')
     .option('--no-color', 'Disable colors')
 
+  program.addHelpText('after', () => {
+    const cmd = ctx.colors.command
+    const dim = ctx.colors.muted
+
+    return [
+      '',
+      ctx.colors.section('Examples:'),
+      '',
+      `  ${cmd('hotella search "Taipei" --checkin 2026-02-10 --checkout 2026-02-17')}`,
+      `  ${dim('Search hotels in Taipei for a week')}`,
+      '',
+      `  ${cmd('hotella search "Tokyo" --checkin 2026-03-01 --checkout 2026-03-05 --sort price-asc --limit 5')}`,
+      `  ${dim('Cheapest 5 hotels in Tokyo')}`,
+      '',
+      `  ${cmd('hotella search "NRT" --checkin 2026-06-01 --checkout 2026-06-07')}`,
+      `  ${dim('Search using airport code (IATA → city resolution)')}`,
+      '',
+      `  ${cmd('hotella search "Paris" --checkin 2026-04-01 --checkout 2026-04-03 --json | jq')}`,
+      `  ${dim('JSON output for scripting')}`,
+      '',
+      ctx.colors.section('Output Formats:'),
+      '',
+      `  ${cmd('--plain')}   ${dim('Human-readable list (default in TTY)')}`,
+      `  ${cmd('--json')}    ${dim('Structured JSON (default in pipes)')}`,
+      `  ${cmd('--table')}   ${dim('Aligned columnar table')}`,
+      '',
+      ctx.colors.section('Environment Variables:'),
+      '',
+      `  ${cmd('NO_COLOR')}  ${dim('Disable all color output (see https://no-color.org)')}`,
+      '',
+    ].join('\n')
+  })
+
   registerSearchCommand(program, ctx)
 
   return program

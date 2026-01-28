@@ -70,7 +70,7 @@ function formatPlainOutput(result: SearchResult): string {
 }
 
 export function registerSearchCommand(program: Command, ctx: CliContext): void {
-  program
+  const searchCmd = program
     .command('search')
     .description('Search hotels in a location')
     .argument('<location>', 'City name or location to search')
@@ -85,162 +85,202 @@ export function registerSearchCommand(program: Command, ctx: CliContext): void {
     .option('--min-rating <n>', 'Minimum rating (0-5)')
     .option('--currency <code>', 'Currency code: USD, EUR, GBP, JPY, TWD', 'USD')
     .option('--browser <type>', 'Browser to impersonate: chrome or firefox', 'chrome')
-    .action(async (location: string, opts: Record<string, string>) => {
-      // Validate dates
-      const checkin = validateDate(opts.checkin, 'check-in')
-      const checkout = validateDate(opts.checkout, 'check-out')
 
-      // Reject past dates (compare YYYY-MM-DD strings — lexicographic ordering is correct)
-      const todayStr = new Date().toISOString().slice(0, 10)
-      if (checkin < todayStr) {
-        throw new UsageError(`Check-in date ${checkin} is in the past. Use a future date.`)
-      }
+  searchCmd.addHelpText('afterAll', () => {
+    const cmd = ctx.colors.command
+    const dim = ctx.colors.muted
 
-      if (checkin >= checkout) {
-        throw new UsageError('Check-out date must be after check-in date.')
-      }
+    return [
+      '',
+      ctx.colors.section('Examples:'),
+      '',
+      `  ${cmd('hotella search "Taipei" --checkin 2026-02-10 --checkout 2026-02-17')}`,
+      `  ${dim('Search hotels in Taipei for a week')}`,
+      '',
+      `  ${cmd('hotella search "Tokyo" --checkin 2026-03-01 --checkout 2026-03-05 --sort price-asc --limit 5')}`,
+      `  ${dim('Cheapest 5 hotels in Tokyo')}`,
+      '',
+      `  ${cmd('hotella search "NRT" --checkin 2026-06-01 --checkout 2026-06-07')}`,
+      `  ${dim('Search using airport code (IATA → city resolution)')}`,
+      '',
+      `  ${cmd('hotella search "Paris" --checkin 2026-04-01 --checkout 2026-04-03 --json | jq')}`,
+      `  ${dim('JSON output for scripting')}`,
+      '',
+      `  ${cmd('hotella search "London" --checkin 2026-05-01 --checkout 2026-05-03 --min-rating 4 --max-price 200')}`,
+      `  ${dim('Filter by rating and price')}`,
+      '',
+      `  ${cmd('hotella search "Berlin" --checkin 2026-06-01 --checkout 2026-06-05 --currency EUR --table')}`,
+      `  ${dim('Euro prices in table format')}`,
+      '',
+      ctx.colors.section('Output Formats:'),
+      '',
+      `  ${cmd('--plain')}   ${dim('Human-readable list (default in TTY)')}`,
+      `  ${cmd('--json')}    ${dim('Structured JSON (default in pipes)')}`,
+      `  ${cmd('--table')}   ${dim('Aligned columnar table')}`,
+      '',
+      ctx.colors.section('Environment Variables:'),
+      '',
+      `  ${cmd('NO_COLOR')}  ${dim('Disable all color output (see https://no-color.org)')}`,
+      '',
+    ].join('\n')
+  })
 
-      // Validate guests
-      const adults = Number.parseInt(opts.adults, 10)
-      const children = Number.parseInt(opts.children, 10)
-      if (Number.isNaN(adults) || adults < 1 || adults > 9) {
-        throw new UsageError('Adults must be between 1 and 9.')
-      }
-      if (Number.isNaN(children) || children < 0 || children > 8) {
-        throw new UsageError('Children must be between 0 and 8.')
-      }
-      if (adults + children > 9) {
-        throw new UsageError('Total guests (adults + children) cannot exceed 9.')
-      }
+  searchCmd.action(async (location: string, opts: Record<string, string>) => {
+    // Validate dates
+    const checkin = validateDate(opts.checkin, 'check-in')
+    const checkout = validateDate(opts.checkout, 'check-out')
 
-      // Validate sort
-      const validSorts: SortMode[] = ['price-asc', 'price-desc', 'rating', 'value']
-      if (!validSorts.includes(opts.sort as SortMode)) {
-        throw new UsageError(`Invalid sort mode "${opts.sort}". Use: ${validSorts.join(', ')}`)
-      }
+    // Reject past dates (compare YYYY-MM-DD strings — lexicographic ordering is correct)
+    const todayStr = new Date().toISOString().slice(0, 10)
+    if (checkin < todayStr) {
+      throw new UsageError(`Check-in date ${checkin} is in the past. Use a future date.`)
+    }
 
-      const limit = Number.parseInt(opts.limit, 10)
-      if (Number.isNaN(limit) || limit < 1) {
-        throw new UsageError('Limit must be a positive number.')
-      }
+    if (checkin >= checkout) {
+      throw new UsageError('Check-out date must be after check-in date.')
+    }
 
-      // Validate currency
-      const currency = opts.currency.toUpperCase()
-      if (!SUPPORTED_CURRENCIES.includes(currency)) {
-        throw new UsageError(
-          `Unsupported currency "${opts.currency}". Use: ${SUPPORTED_CURRENCIES.join(', ')}`,
-        )
-      }
+    // Validate guests
+    const adults = Number.parseInt(opts.adults, 10)
+    const children = Number.parseInt(opts.children, 10)
+    if (Number.isNaN(adults) || adults < 1 || adults > 9) {
+      throw new UsageError('Adults must be between 1 and 9.')
+    }
+    if (Number.isNaN(children) || children < 0 || children > 8) {
+      throw new UsageError('Children must be between 0 and 8.')
+    }
+    if (adults + children > 9) {
+      throw new UsageError('Total guests (adults + children) cannot exceed 9.')
+    }
 
-      // Resolve IATA airport codes to city names
-      const locationResult = await withSpinner(ctx, 'Resolving location', () =>
-        resolveLocation(location),
+    // Validate sort
+    const validSorts: SortMode[] = ['price-asc', 'price-desc', 'rating', 'value']
+    if (!validSorts.includes(opts.sort as SortMode)) {
+      throw new UsageError(`Invalid sort mode "${opts.sort}". Use: ${validSorts.join(', ')}`)
+    }
+
+    const limit = Number.parseInt(opts.limit, 10)
+    if (Number.isNaN(limit) || limit < 1) {
+      throw new UsageError('Limit must be a positive number.')
+    }
+
+    // Validate currency
+    const currency = opts.currency.toUpperCase()
+    if (!SUPPORTED_CURRENCIES.includes(currency)) {
+      throw new UsageError(
+        `Unsupported currency "${opts.currency}". Use: ${SUPPORTED_CURRENCIES.join(', ')}`,
       )
-      const resolvedLocation = locationResult.resolved
-      if (locationResult.wasIata) {
-        logVerbose(ctx, `Resolving location "${locationResult.original}" → "${resolvedLocation}"`)
-      }
+    }
 
-      const query: SearchQuery = {
-        location: resolvedLocation,
-        checkin,
-        checkout,
-        adults,
-        children,
-        currency,
-      }
+    // Resolve IATA airport codes to city names
+    const locationResult = await withSpinner(ctx, 'Resolving location', () =>
+      resolveLocation(location),
+    )
+    const resolvedLocation = locationResult.resolved
+    if (locationResult.wasIata) {
+      logVerbose(ctx, `Resolving location "${locationResult.original}" → "${resolvedLocation}"`)
+    }
 
-      logVerbose(ctx, `Searching hotels in "${resolvedLocation}"...`)
-      logDebug(ctx, 'Search query:', query)
+    const query: SearchQuery = {
+      location: resolvedLocation,
+      checkin,
+      checkout,
+      adults,
+      children,
+      currency,
+    }
 
-      // Fetch
-      const browser = opts.browser as 'chrome' | 'firefox'
-      const { html, url } = await withSpinner(ctx, 'Searching hotels', () =>
-        fetchHotelsHtml(query, browser),
+    logVerbose(ctx, `Searching hotels in "${resolvedLocation}"...`)
+    logDebug(ctx, 'Search query:', query)
+
+    // Fetch
+    const browser = opts.browser as 'chrome' | 'firefox'
+    const { html, url } = await withSpinner(ctx, 'Searching hotels', () =>
+      fetchHotelsHtml(query, browser),
+    )
+    logVerbose(ctx, `Fetched ${(html.length / 1024).toFixed(0)}KB from Google Hotels`)
+    logDebug(ctx, `URL: ${url}`)
+
+    // Parse
+    let hotels = parseHotelsHtml(html, query.currency)
+    logVerbose(ctx, `Parsed ${hotels.length} hotels`)
+
+    if (hotels.length === 0 && html.length > 5000) {
+      // Non-empty HTML but no hotels parsed — likely a layout change
+      logDebug(ctx, 'No hotel cards found. HTML may have changed structure.', {
+        htmlLength: html.length,
+        hasUaTTDe: html.includes('uaTTDe'),
+        hasBgYkof: html.includes('BgYkof'),
+      })
+      throw new ApiError(
+        'Failed to parse hotel data. Google may have changed their page layout. Try --debug for details.',
       )
-      logVerbose(ctx, `Fetched ${(html.length / 1024).toFixed(0)}KB from Google Hotels`)
-      logDebug(ctx, `URL: ${url}`)
+    }
 
-      // Parse
-      let hotels = parseHotelsHtml(html, query.currency)
-      logVerbose(ctx, `Parsed ${hotels.length} hotels`)
+    if (hotels.length === 0) {
+      output(
+        `No hotels found for "${resolvedLocation}". Try a different location or broader dates.`,
+      )
+      return
+    }
 
-      if (hotels.length === 0 && html.length > 5000) {
-        // Non-empty HTML but no hotels parsed — likely a layout change
-        logDebug(ctx, 'No hotel cards found. HTML may have changed structure.', {
-          htmlLength: html.length,
-          hasUaTTDe: html.includes('uaTTDe'),
-          hasBgYkof: html.includes('BgYkof'),
-        })
-        throw new ApiError(
-          'Failed to parse hotel data. Google may have changed their page layout. Try --debug for details.',
-        )
-      }
+    // Filter
+    const totalBeforeFilter = hotels.length
+    const minPrice = opts.minPrice !== undefined ? Number.parseFloat(opts.minPrice) : undefined
+    const maxPrice = opts.maxPrice !== undefined ? Number.parseFloat(opts.maxPrice) : undefined
+    const minRating = opts.minRating !== undefined ? Number.parseFloat(opts.minRating) : undefined
 
-      if (hotels.length === 0) {
-        output(
-          `No hotels found for "${resolvedLocation}". Try a different location or broader dates.`,
-        )
-        return
-      }
+    if (minPrice !== undefined && (Number.isNaN(minPrice) || minPrice < 0)) {
+      throw new UsageError('--min-price must be a non-negative number.')
+    }
+    if (maxPrice !== undefined && (Number.isNaN(maxPrice) || maxPrice < 0)) {
+      throw new UsageError('--max-price must be a non-negative number.')
+    }
+    if (minRating !== undefined && (Number.isNaN(minRating) || minRating < 0 || minRating > 5)) {
+      throw new UsageError('--min-rating must be between 0 and 5.')
+    }
 
-      // Filter
-      const totalBeforeFilter = hotels.length
-      const minPrice = opts.minPrice !== undefined ? Number.parseFloat(opts.minPrice) : undefined
-      const maxPrice = opts.maxPrice !== undefined ? Number.parseFloat(opts.maxPrice) : undefined
-      const minRating = opts.minRating !== undefined ? Number.parseFloat(opts.minRating) : undefined
+    hotels = filterByPrice(hotels, { minPrice, maxPrice })
+    hotels = filterByRating(hotels, { minRating })
 
-      if (minPrice !== undefined && (Number.isNaN(minPrice) || minPrice < 0)) {
-        throw new UsageError('--min-price must be a non-negative number.')
-      }
-      if (maxPrice !== undefined && (Number.isNaN(maxPrice) || maxPrice < 0)) {
-        throw new UsageError('--max-price must be a non-negative number.')
-      }
-      if (minRating !== undefined && (Number.isNaN(minRating) || minRating < 0 || minRating > 5)) {
-        throw new UsageError('--min-rating must be between 0 and 5.')
-      }
+    if (totalBeforeFilter > 0 && hotels.length < totalBeforeFilter) {
+      logVerbose(ctx, `Filtered: ${hotels.length} of ${totalBeforeFilter} hotels match criteria`)
+    }
 
-      hotels = filterByPrice(hotels, { minPrice, maxPrice })
-      hotels = filterByRating(hotels, { minRating })
+    const hasFilters = minPrice !== undefined || maxPrice !== undefined || minRating !== undefined
+    const allFilteredOut = hasFilters && totalBeforeFilter > 0 && hotels.length === 0
 
-      if (totalBeforeFilter > 0 && hotels.length < totalBeforeFilter) {
-        logVerbose(ctx, `Filtered: ${hotels.length} of ${totalBeforeFilter} hotels match criteria`)
-      }
+    // Sort
+    hotels = sortHotels(hotels, opts.sort as SortMode)
 
-      const hasFilters = minPrice !== undefined || maxPrice !== undefined || minRating !== undefined
-      const allFilteredOut = hasFilters && totalBeforeFilter > 0 && hotels.length === 0
+    // Limit
+    hotels = hotels.slice(0, limit)
 
-      // Sort
-      hotels = sortHotels(hotels, opts.sort as SortMode)
+    // Build result
+    const prices = hotels.map((h) => h.price).filter((p): p is number => p !== null)
+    const result: SearchResult = {
+      query,
+      hotels,
+      summary: {
+        total: hotels.length,
+        lowestPrice: prices.length > 0 ? Math.min(...prices) : null,
+        highestPrice: prices.length > 0 ? Math.max(...prices) : null,
+      },
+    }
 
-      // Limit
-      hotels = hotels.slice(0, limit)
-
-      // Build result
-      const prices = hotels.map((h) => h.price).filter((p): p is number => p !== null)
-      const result: SearchResult = {
-        query,
-        hotels,
-        summary: {
-          total: hotels.length,
-          lowestPrice: prices.length > 0 ? Math.min(...prices) : null,
-          highestPrice: prices.length > 0 ? Math.max(...prices) : null,
-        },
-      }
-
-      // Output
-      if (allFilteredOut) {
-        if (ctx.output.format === 'json') {
-          output(JSON.stringify(result, null, 2))
-        } else {
-          output('No hotels match your filters.')
-        }
-      } else if (ctx.output.format === 'json') {
+    // Output
+    if (allFilteredOut) {
+      if (ctx.output.format === 'json') {
         output(JSON.stringify(result, null, 2))
-      } else if (ctx.output.format === 'table') {
-        output(formatTableOutput(result))
       } else {
-        output(formatPlainOutput(result))
+        output('No hotels match your filters.')
       }
-    })
+    } else if (ctx.output.format === 'json') {
+      output(JSON.stringify(result, null, 2))
+    } else if (ctx.output.format === 'table') {
+      output(formatTableOutput(result))
+    } else {
+      output(formatPlainOutput(result))
+    }
+  })
 }

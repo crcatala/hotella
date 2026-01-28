@@ -23,3 +23,13 @@ Started: 2026-01-27T23:20:22.132Z
 - Files changed: `.gitignore`, `vitest.config.ts`, `tests/fixtures/google-hotels-cards.html`, `scripts/update-fixture.sh`, `tests/unit/parser.test.ts`, `tests/unit/sort.test.ts`, `tests/unit/cli.test.ts`, `tests/integration/cli.test.ts`, `tests/live/search.live.test.ts`
 - **Learnings:** vitest `exclude` in config prevents files from being found even when explicitly passed as path args. Live tests must use `describe.skipIf()` as the primary gate. The verify script counts test FILES not individual tests (shows "9 passed").
 ---
+
+## [2026-01-27 16:03] - hot-2a08
+- Added rich help text with examples to both `hotella --help` and `hotella search --help`
+- Program-level help shows 4 common examples, output format explanations, and NO_COLOR env var
+- Search-level help shows 6 examples (including filter and currency examples), output formats, and env vars
+- Examples styled with `ctx.colors.command()` and `ctx.colors.muted()` for TTY mode
+- Used `addHelpText('after', ...)` on program and `addHelpText('afterAll', ...)` on search to avoid duplication
+- Files changed: `src/cli/program.ts`, `src/commands/search.ts`
+- **Learnings:** Commander's `afterAll` propagates to subcommand help output. Use `after` on the parent program to keep help text scoped to that command only.
+---
