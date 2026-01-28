@@ -43,7 +43,7 @@ tasks:
 
   - id: hot-cdde
     title: "Package.json cleanup for npm publish"
-    status: pending
+    status: done
     acceptance:
       - "\"repository\" field points to github.com/crcatala/hotella (infer from git remote)"
       - "\"homepage\" field set (GitHub repo URL)"

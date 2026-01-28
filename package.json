@@ -3,6 +3,24 @@
   "version": "0.1.0",
   "description": "Search hotel prices and availability from the terminal via Google Hotels",
   "license": "MIT",
+  "author": "crcatala",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crcatala/hotella.git"
+  },
+  "homepage": "https://github.com/crcatala/hotella",
+  "bugs": {
+    "url": "https://github.com/crcatala/hotella/issues"
+  },
+  "keywords": [
+    "hotel",
+    "travel",
+    "cli",
+    "google-hotels",
+    "price-comparison",
+    "scraper",
+    "terminal"
+  ],
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -11,7 +29,9 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "tsgo",
@@ -34,7 +54,8 @@
     "typecheck:verbose": "tsgo --noEmit",
     "verify": "npx tsx scripts/verify.ts",
     "verify:verbose": "VERBOSE=1 npx tsx scripts/verify.ts",
-    "prepare": "lefthook install || true"
+    "prepare": "lefthook install || true",
+    "prepublishOnly": "pnpm run verify && pnpm run build"
   },
   "dependencies": {
     "cheerio": "^1.0.0",
