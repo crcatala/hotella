@@ -96,7 +96,7 @@ tasks:
   # ── Phase 2: Docs + CI (depend on package.json) ──────────────────────
   - id: hot-605d
     title: "Add CONTRIBUTING.md"
-    status: pending
+    status: done
     acceptance:
       - "CONTRIBUTING.md exists at repo root"
       - "Covers prerequisites: Node 22+, pnpm"

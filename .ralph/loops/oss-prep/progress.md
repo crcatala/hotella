@@ -38,3 +38,14 @@ Started: 2026-01-27T23:36:06.388Z
 - Files changed: CHANGELOG.md (new)
 - **Learnings:** Keep a Changelog uses YYYY-MM-DD date format; release-it's keep-a-changelog plugin fills in the date at release time
 ---
+
+## [2026-01-28 08:03] - hot-605d
+- Created CONTRIBUTING.md with all required sections
+- Covers prerequisites (Node 22+, pnpm), getting started, development commands table
+- Documents project structure (src/cli/, src/commands/, src/lib/)
+- Explains branch workflow, PR process, and code style enforcement (oxlint + prettier)
+- References verify script as single source of truth for CI checks
+- Includes release process section pointing to release-it config
+- Files changed: CONTRIBUTING.md (new)
+- **Learnings:** The verify script aggregates all checks; documenting it as the CI gate simplifies contributor guidance
+---
