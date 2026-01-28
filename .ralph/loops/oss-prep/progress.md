@@ -58,3 +58,13 @@ Started: 2026-01-27T23:36:06.388Z
 - Files changed: .github/workflows/ci.yml (new)
 - **Learnings:** Version tags used for now (v4); SHA pinning deferred to hot-995a per task notes
 ---
+
+## [2026-01-28 08:05] - hot-995a
+- Pinned all GitHub Actions in ci.yml to SHA commits
+- Updated actions/checkout v4 → v4.3.1 (34e114876b0b11c390a56381ad16ebd13914f8d5)
+- Updated pnpm/action-setup v4 → v4.2.0 (41ff72655975bd51cab0327fa583b6e92b6d3061)
+- Updated actions/setup-node v4 → v4.4.0 (49933ea5288caeca8642d1e84afbd3f7d6820020)
+- Each SHA has a version comment for human readability
+- Files changed: .github/workflows/ci.yml
+- **Learnings:** Use git ls-remote --tags to lookup SHAs; for annotated tags, the ^{} entry is the actual commit
+---

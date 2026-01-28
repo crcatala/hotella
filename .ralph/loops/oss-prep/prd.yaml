@@ -135,7 +135,7 @@ tasks:
   # ── Phase 3: Security hardening (depend on CI) ───────────────────────
   - id: hot-995a
     title: "Pin GitHub Actions to SHA commits"
-    status: pending
+    status: done
     acceptance:
       - "All uses: lines in .github/workflows/*.yml reference full SHA commits"
       - "Each SHA line has a comment indicating the human-readable version (e.g., # v4.2.2)"
