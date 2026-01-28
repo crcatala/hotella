@@ -1,6 +1,7 @@
 import { Command, Option } from 'commander'
 import { registerSearchCommand } from '../commands/search.js'
 import type { CliContext } from './context.js'
+import { formatHelpFooter, formatSharedExamples } from './help.js'
 
 const VERSION = '0.1.0'
 
@@ -40,6 +41,20 @@ export function createProgram(ctx: CliContext): Command {
     .option('--verbose', 'Show operational progress')
     .option('--debug', 'Show debug information (implies --verbose)')
     .option('--no-color', 'Disable colors')
+
+  program.addHelpText('after', () => {
+    const cmd = ctx.colors.command
+    const dim = ctx.colors.muted
+
+    return [
+      '',
+      ctx.colors.section('Examples:'),
+      '',
+      ...formatSharedExamples(cmd, dim),
+      '',
+      ...formatHelpFooter(ctx.colors.section, cmd, dim),
+    ].join('\n')
+  })
 
   registerSearchCommand(program, ctx)
 

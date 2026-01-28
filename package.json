@@ -13,7 +13,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsgo",
     "dev": "tsx src/cli.ts",
     "test": "bash scripts/check.sh test",
     "test:verbose": "bash scripts/test-unit.sh",
@@ -30,7 +30,7 @@
     "format:check": "bash scripts/check.sh format",
     "format:check:verbose": "prettier --check \"src/**/*.ts\"",
     "typecheck": "bash scripts/check.sh typecheck",
-    "typecheck:verbose": "tsc --noEmit",
+    "typecheck:verbose": "tsgo --noEmit",
     "verify": "npx tsx scripts/verify.ts",
     "verify:verbose": "VERBOSE=1 npx tsx scripts/verify.ts",
     "prepare": "lefthook install || true"
@@ -44,6 +44,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "@typescript/native-preview": "7.0.0-dev.20260127.1",
     "lefthook": "^2.0.16",
     "oxlint": "^1.42.0",
     "prettier": "^3.8.1",

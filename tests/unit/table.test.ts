@@ -67,15 +67,7 @@ describe('formatTableRow', () => {
 
   it('truncates long amenities with ellipsis', () => {
     const hotel = makeHotel({
-      amenities: [
-        'Free Wi-Fi',
-        'Air conditioning',
-        'Pool',
-        'Spa',
-        'Gym',
-        'Restaurant',
-        'Bar',
-      ],
+      amenities: ['Free Wi-Fi', 'Air conditioning', 'Pool', 'Spa', 'Gym', 'Restaurant', 'Bar'],
     })
     const row = formatTableRow(hotel, 'USD')
     expect(row).toContain('…')

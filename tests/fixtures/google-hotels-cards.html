@@ -1,0 +1,103 @@
+<!--
+  Stripped-down Google Hotels fixture for unit testing.
+  Contains only the hotel card divs (div.uaTTDe) with realistic markup.
+  Covers: normal hotel, missing price, missing rating, mixed-language name, hotel with many amenities.
+
+  To regenerate from a live page, run: bash scripts/update-fixture.sh
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Hotels fixture</title></head>
+<body>
+
+<!-- Card 1: Normal hotel with all fields -->
+<div class="uaTTDe">
+  <h2 class="BgYkof">Grand Hyatt Tokyo</h2>
+  <span class="KFi5wf lA0BZ">4.5</span>
+  <span class="LtjZ2d">Free Wi-Fi</span>
+  <span class="LtjZ2d">Pool</span>
+  <span class="LtjZ2d">Spa</span>
+  <a href="/travel/hotels/entity/abc123">View deal</a>
+  <span>$250 per night</span>
+</div>
+
+<!-- Card 2: Budget hotel, low rating -->
+<div class="uaTTDe">
+  <h2 class="BgYkof">Budget Inn Downtown</h2>
+  <span class="KFi5wf lA0BZ">3.2</span>
+  <span class="LtjZ2d">Free Wi-Fi</span>
+  <a href="/travel/hotels/entity/def456">View deal</a>
+  <span>$75 per night</span>
+</div>
+
+<!-- Card 3: Missing price -->
+<div class="uaTTDe">
+  <h2 class="BgYkof">The Ritz-Carlton</h2>
+  <span class="KFi5wf lA0BZ">4.8</span>
+  <span class="LtjZ2d">Pool</span>
+  <span class="LtjZ2d">Spa</span>
+  <span class="LtjZ2d">Restaurant</span>
+  <a href="/travel/hotels/entity/ghi789">View deal</a>
+  <span>Check availability</span>
+</div>
+
+<!-- Card 4: Missing rating -->
+<div class="uaTTDe">
+  <h2 class="BgYkof">Sakura Hostel</h2>
+  <span class="LtjZ2d">Free Wi-Fi</span>
+  <a href="/travel/hotels/entity/jkl012">View deal</a>
+  <span>$45 per night</span>
+</div>
+
+<!-- Card 5: Mixed-language name (Japanese + English) -->
+<div class="uaTTDe">
+  <h2 class="BgYkof">ホテル東京ステーション Hotel</h2>
+  <span class="KFi5wf lA0BZ">4.1</span>
+  <span class="LtjZ2d">Free Wi-Fi</span>
+  <span class="LtjZ2d">Air conditioning</span>
+  <a href="/travel/hotels/entity/mno345">View deal</a>
+  <span>$180 per night</span>
+</div>
+
+<!-- Card 6: Hotel with many amenities -->
+<div class="uaTTDe">
+  <h2 class="BgYkof">Park Hotel Meguro</h2>
+  <span class="KFi5wf lA0BZ">4.3</span>
+  <span class="LtjZ2d">Free Wi-Fi</span>
+  <span class="LtjZ2d">Pool</span>
+  <span class="LtjZ2d">Spa</span>
+  <span class="LtjZ2d">Gym</span>
+  <span class="LtjZ2d">Restaurant</span>
+  <span class="LtjZ2d">Bar</span>
+  <span class="LtjZ2d">Room service</span>
+  <a href="/travel/hotels/entity/pqr678">View deal</a>
+  <span>$320 per night</span>
+</div>
+
+<!-- Card 7: High price with comma -->
+<div class="uaTTDe">
+  <h2 class="BgYkof">Aman Tokyo</h2>
+  <span class="KFi5wf lA0BZ">4.9</span>
+  <span class="LtjZ2d">Pool</span>
+  <span class="LtjZ2d">Spa</span>
+  <a href="/travel/hotels/entity/stu901">View deal</a>
+  <span>$1,200 per night</span>
+</div>
+
+<!-- Card 8: No name (should be skipped by parser) -->
+<div class="uaTTDe">
+  <h2 class="BgYkof"></h2>
+  <span>$99 per night</span>
+</div>
+
+<!-- Card with aria-label rating fallback -->
+<div class="uaTTDe">
+  <h2 class="BgYkof">Keio Plaza Hotel</h2>
+  <span aria-label="4.2 out of 5">Rated 4.2</span>
+  <span class="LtjZ2d">Free Wi-Fi</span>
+  <a href="/travel/hotels/entity/vwx234">View deal</a>
+  <span>$160 per night</span>
+</div>
+
+</body>
+</html>

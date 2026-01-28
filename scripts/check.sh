@@ -34,7 +34,7 @@ case "$cmd" in
     run_silent "Lint" "npx oxlint src/ $extra_args" "pnpm run lint:verbose"
     ;;
   typecheck)
-    run_silent "Typecheck" "npx tsc --noEmit $extra_args" "pnpm run typecheck:verbose"
+    run_silent "Typecheck" "npx tsgo --noEmit $extra_args" "pnpm run typecheck:verbose"
     ;;
   format)
     run_silent "Format" "npx prettier --check 'src/**/*.ts' $extra_args" "pnpm run format:check:verbose"

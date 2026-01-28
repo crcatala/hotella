@@ -17,7 +17,7 @@ pre_commit: "pnpm run verify"
 tasks:
   - id: hot-c9fd
     title: "Comprehensive test suite with HTML fixtures"
-    status: pending
+    status: done
     acceptance:
       - "Stripped-down HTML fixture at tests/fixtures/google-hotels-cards.html containing only hotel card divs"
       - "Fixture covers representative cases: normal hotel, missing price, missing rating, mixed-language name, hotel with many amenities"
@@ -48,7 +48,7 @@ tasks:
 
   - id: hot-2a08
     title: "Rich help text with examples"
-    status: pending
+    status: done
     acceptance:
       - "hotella --help shows common usage examples with descriptions"
       - "hotella search --help shows search-specific examples"
@@ -74,7 +74,7 @@ tasks:
 
   - id: hot-2561
     title: "Comprehensive README with install instructions and examples"
-    status: pending
+    status: done
     acceptance:
       - "README covers: project description and motivation"
       - "Installation section: pnpm install, npm install, npx usage"
