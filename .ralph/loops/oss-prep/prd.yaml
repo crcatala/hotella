@@ -62,7 +62,7 @@ tasks:
 
   - id: hot-1d37
     title: "Dynamic version from package.json"
-    status: pending
+    status: done
     acceptance:
       - "No hardcoded version string in src/cli/program.ts"
       - "Version is read from package.json at build time or runtime"
