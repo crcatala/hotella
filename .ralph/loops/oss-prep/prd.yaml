@@ -80,7 +80,7 @@ tasks:
 
   - id: hot-81cd
     title: "Add CHANGELOG.md"
-    status: pending
+    status: done
     acceptance:
       - "CHANGELOG.md exists at repo root"
       - "Follows Keep a Changelog format (https://keepachangelog.com/)"
