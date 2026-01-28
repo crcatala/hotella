@@ -17,7 +17,7 @@ pre_commit: "pnpm run verify"
 tasks:
   - id: hot-c9fd
     title: "Comprehensive test suite with HTML fixtures"
-    status: pending
+    status: done
     acceptance:
       - "Stripped-down HTML fixture at tests/fixtures/google-hotels-cards.html containing only hotel card divs"
       - "Fixture covers representative cases: normal hotel, missing price, missing rating, mixed-language name, hotel with many amenities"

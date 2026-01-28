@@ -7,3 +7,9 @@ export default defineConfig({
     testTimeout: 10_000,
   },
 })
+
+/**
+ * Live tests (tests/live/) are excluded from the default vitest run above.
+ * They are gated behind HOTELLA_LIVE_TEST=1 via describe.skipIf() and can
+ * be run explicitly with: pnpm run test:live:verbose
+ */
