@@ -115,7 +115,7 @@ tasks:
 
   - id: hot-9e30
     title: "Add CI workflow for PRs and pushes"
-    status: pending
+    status: done
     acceptance:
       - ".github/workflows/ci.yml exists"
       - "Triggers on push to main and pull_request to main"

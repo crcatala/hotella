@@ -49,3 +49,12 @@ Started: 2026-01-27T23:36:06.388Z
 - Files changed: CONTRIBUTING.md (new)
 - **Learnings:** The verify script aggregates all checks; documenting it as the CI gate simplifies contributor guidance
 ---
+
+## [2026-01-28 08:04] - hot-9e30
+- Created .github/workflows/ci.yml for CI on PRs and pushes to main
+- Single job workflow using pnpm/action-setup and actions/setup-node
+- Pins Node to version 22, uses pnpm cache, installs with --frozen-lockfile
+- Runs pnpm run verify as the single check (covers lint, typecheck, format, test, build)
+- Files changed: .github/workflows/ci.yml (new)
+- **Learnings:** Version tags used for now (v4); SHA pinning deferred to hot-995a per task notes
+---
