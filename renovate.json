@@ -1,9 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended",
-    ":semanticCommits"
-  ],
+  "extends": ["config:recommended", ":semanticCommits"],
   "labels": ["dependencies"],
   "automerge": false,
   "lockFileMaintenance": {
@@ -18,13 +15,13 @@
     {
       "description": "Group minor/patch updates",
       "matchUpdateTypes": ["minor", "patch"],
-      "excludePackageNames": ["typescript"],
-      "groupName": "minor and patch dependencies"
+      "groupName": "minor and patch dependencies",
+      "matchPackageNames": ["!typescript"]
     },
     {
       "description": "Group type definitions",
-      "matchPackagePatterns": ["^@types/"],
-      "groupName": "type definitions"
+      "groupName": "type definitions",
+      "matchPackageNames": ["/^@types//"]
     }
   ],
   "schedule": ["before 6am on monday"]
