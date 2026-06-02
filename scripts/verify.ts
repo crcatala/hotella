@@ -1,4 +1,4 @@
-#!/usr/bin/env npx tsx
+#!/usr/bin/env tsx
 /**
  * verify.ts - Run all verification checks in parallel with nice output
  *
@@ -6,8 +6,8 @@
  * Falls back to simple output when captured (e.g., by AI agents) to save tokens.
  *
  * Usage:
- *   npx tsx scripts/verify.ts          # Run all checks in parallel
- *   VERBOSE=1 npx tsx scripts/verify.ts # Show full output on success too
+ *   pnpm exec tsx scripts/verify.ts          # Run all checks in parallel
+ *   VERBOSE=1 pnpm exec tsx scripts/verify.ts # Show full output on success too
  */
 
 import { execFile } from 'node:child_process'
@@ -50,17 +50,17 @@ const checks: CheckConfig[] = [
   },
   {
     name: 'Lint',
-    command: ['npx', 'oxlint', 'src/'],
+    command: ['pnpm', 'exec', 'oxlint', 'src/'],
     verboseHint: 'pnpm run lint:verbose',
   },
   {
     name: 'Typecheck',
-    command: ['npx', 'tsgo', '--noEmit'],
+    command: ['pnpm', 'exec', 'tsgo', '--noEmit'],
     verboseHint: 'pnpm run typecheck:verbose',
   },
   {
     name: 'Format',
-    command: ['npx', 'prettier', '--check', 'src/**/*.ts'],
+    command: ['pnpm', 'exec', 'prettier', '--check', 'src/**/*.ts'],
     verboseHint: 'pnpm run format:check:verbose',
   },
 ]
