@@ -8,4 +8,4 @@
 
 set -e
 
-exec npx vitest run tests/unit tests/integration "$@"
+exec pnpm exec vitest run tests/unit tests/integration "$@"

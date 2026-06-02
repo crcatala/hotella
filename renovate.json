@@ -1,7 +1,13 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", ":semanticCommits"],
-  "labels": ["dependencies"],
+  "extends": [
+    "config:recommended",
+    ":semanticCommits",
+    "helpers:pinGitHubActionDigestsToSemver"
+  ],
+  "labels": [
+    "dependencies"
+  ],
   "automerge": false,
   "lockFileMaintenance": {
     "enabled": true
@@ -9,20 +15,41 @@
   "packageRules": [
     {
       "description": "TypeScript - can introduce breaking type checks",
-      "matchPackageNames": ["typescript"],
+      "matchPackageNames": [
+        "typescript"
+      ],
       "groupName": null
     },
     {
       "description": "Group minor/patch updates",
-      "matchUpdateTypes": ["minor", "patch"],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
       "groupName": "minor and patch dependencies",
-      "matchPackageNames": ["!typescript"]
+      "matchPackageNames": [
+        "!typescript"
+      ]
     },
     {
       "description": "Group type definitions",
       "groupName": "type definitions",
-      "matchPackageNames": ["/^@types//"]
+      "matchPackageNames": [
+        "/^@types//"
+      ]
+    },
+    {
+      "description": "Never automerge major updates; require human review",
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "automerge": false
     }
   ],
-  "schedule": ["before 6am on monday"]
+  "schedule": [
+    "before 6am on monday"
+  ],
+  "minimumReleaseAge": "7 days",
+  "osvVulnerabilityAlerts": true,
+  "ignoreScripts": true
 }

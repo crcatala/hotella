@@ -25,22 +25,22 @@ case "$cmd" in
     run_silent_test "Unit Tests" "FORCE_COLOR=1 bash scripts/test-unit.sh $extra_args" "pnpm run test:verbose $extra_args"
     ;;
   test:live)
-    run_silent_test "Live Tests" "HOTELLA_LIVE_TEST=1 npx vitest run tests/live $extra_args" "pnpm run test:live:verbose $extra_args"
+    run_silent_test "Live Tests" "HOTELLA_LIVE_TEST=1 pnpm exec vitest run tests/live $extra_args" "pnpm run test:live:verbose $extra_args"
     ;;
   test:all)
-    run_silent_test "All Tests" "HOTELLA_LIVE_TEST=1 npx vitest run $extra_args" "pnpm run test:all:verbose $extra_args"
+    run_silent_test "All Tests" "HOTELLA_LIVE_TEST=1 pnpm exec vitest run $extra_args" "pnpm run test:all:verbose $extra_args"
     ;;
   lint)
-    run_silent "Lint" "npx oxlint src/ $extra_args" "pnpm run lint:verbose"
+    run_silent "Lint" "pnpm exec oxlint src/ $extra_args" "pnpm run lint:verbose"
     ;;
   typecheck)
-    run_silent "Typecheck" "npx tsgo --noEmit $extra_args" "pnpm run typecheck:verbose"
+    run_silent "Typecheck" "pnpm exec tsgo --noEmit $extra_args" "pnpm run typecheck:verbose"
     ;;
   format)
-    run_silent "Format" "npx prettier --check 'src/**/*.ts' $extra_args" "pnpm run format:check:verbose"
+    run_silent "Format" "pnpm exec prettier --check 'src/**/*.ts' $extra_args" "pnpm run format:check:verbose"
     ;;
   format-fix)
-    run_silent "Format (fix)" "npx prettier --write 'src/**/*.ts' $extra_args" "pnpm run format:verbose"
+    run_silent "Format (fix)" "pnpm exec prettier --write 'src/**/*.ts' $extra_args" "pnpm run format:verbose"
     ;;
   *)
     echo "Usage: $0 {test|test:live|test:all|lint|typecheck|format|format-fix} [extra args...]"
