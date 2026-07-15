@@ -61,14 +61,14 @@
   "dependencies": {
     "cheerio": "^1.0.0",
     "commander": "^14.0.0",
-    "impit": "^0.8.0",
+    "impit": "^0.14.0",
     "kleur": "^4.1.5",
     "ora": "^9.1.0"
   },
   "devDependencies": {
     "@release-it/keep-a-changelog": "^7.0.0",
     "@types/node": "^22.0.0",
-    "@typescript/native-preview": "7.0.0-dev.20260127.1",
+    "@typescript/native-preview": "7.0.0-dev.20260707.2",
     "lefthook": "^2.0.16",
     "oxlint": "^1.42.0",
     "prettier": "^3.8.1",
