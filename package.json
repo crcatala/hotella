@@ -67,7 +67,7 @@
   },
   "devDependencies": {
     "@release-it/keep-a-changelog": "^7.0.0",
-    "@types/node": "^22.0.0",
+    "@types/node": "^24.0.0",
     "@typescript/native-preview": "7.0.0-dev.20260127.1",
     "lefthook": "^2.0.16",
     "oxlint": "^1.42.0",
