@@ -3,7 +3,7 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   test: {
     include: ['tests/**/*.test.ts'],
-    exclude: ['tests/live/**'],
+    exclude: process.env.HOTELLA_LIVE_TEST ? [] : ['tests/live/**'],
     testTimeout: 10_000,
   },
 })
