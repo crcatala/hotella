@@ -201,7 +201,7 @@ The whole pipeline runs in ~0.3s — a single HTTP request with no browser overh
 
 ## Known Limitations
 
-- **Scraping fragility** — Google Hotels HTML structure can change without notice, which may break parsing. Run `pnpm test` to check if selectors still work.
+- **Scraping fragility** — Google Hotels HTML structure can change without notice, which may break parsing. Run `pnpm test:live` periodically to exercise the real fetch-and-parse path.
 - **Rate limiting** — Rapid or automated use may trigger Google's bot detection. The browser impersonation helps, but isn't foolproof.
 - **Currency support** — Limited to USD, EUR, GBP, JPY, and TWD. Google may not honor all currency requests for all regions.
 - **Result count** — Returns only the first page of results from Google Hotels (typically 15–25 hotels).
