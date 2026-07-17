@@ -1,0 +1,5 @@
+# Supply-chain policy settings must live in the workspace config with pnpm 11.
+minimumReleaseAge: 10080
+allowBuilds:
+  esbuild: true
+  lefthook: true
