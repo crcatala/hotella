@@ -44,6 +44,10 @@ jobs:
   test:
     name: Run Live Tests
     needs: prepare
+    # Re-check authorization because a collaborator can re-run this job alone.
+    if: |
+      github.actor == github.repository_owner &&
+      github.triggering_actor == github.repository_owner
     runs-on: ubicloud-standard-2
     timeout-minutes: 10
     # This job executes PR-controlled code. It deliberately has no write token.
@@ -73,7 +77,12 @@ jobs:
   report:
     name: Report Live Test Result
     needs: [prepare, test]
-    if: always() && needs.prepare.result == 'success'
+    # Re-check authorization because a collaborator can re-run this job alone.
+    if: |
+      always() &&
+      needs.prepare.result == 'success' &&
+      github.actor == github.repository_owner &&
+      github.triggering_actor == github.repository_owner
     runs-on: ubicloud-standard-2
     permissions:
       checks: write
@@ -91,13 +100,14 @@ jobs:
                 ? 'cancelled'
                 : 'failure';
             const passed = conclusion === 'success';
+            const sha = '${{ needs.prepare.outputs.pr_sha }}';
             const logsUrl = '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}';
 
             await github.rest.checks.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
               name: 'Live Tests',
-              head_sha: '${{ needs.prepare.outputs.pr_sha }}',
+              head_sha: sha,
               status: 'completed',
               conclusion,
               details_url: logsUrl,
@@ -111,5 +121,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: Number('${{ needs.prepare.outputs.pr_number }}'),
-              body: `${passed ? '✅ Live tests passed.' : '❌ Live tests failed.'} [View logs](${logsUrl})`,
+              body: `${passed ? '✅ Live tests passed.' : '❌ Live tests failed.'} Tested commit: \`${sha}\`. [View logs](${logsUrl})`,
             });
