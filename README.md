@@ -7,10 +7,10 @@ Compare prices from Booking.com, Expedia, Hotels.com, and direct hotel sites in 
 ## Quick Start
 
 ```bash
-npx hotella search "Taipei" \
-  --checkin "$(node -e 'console.log(new Date(Date.now() + 7 * 86_400_000).toISOString().slice(0, 10))')" \
-  --checkout "$(node -e 'console.log(new Date(Date.now() + 14 * 86_400_000).toISOString().slice(0, 10))')"
+npx hotella search "Taipei" --checkin <future-checkin-date> --checkout <future-checkout-date>
 ```
+
+Replace the placeholders with your travel dates in `YYYY-MM-DD` format.
 
 ## Installation
 
@@ -29,7 +29,7 @@ Requires **Node.js 22** or later.
 
 ## Usage
 
-Use future dates in `YYYY-MM-DD` format. The Quick Start command above generates them automatically.
+Use future dates in `YYYY-MM-DD` format.
 
 ### Basic Search
 
