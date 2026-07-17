@@ -74,7 +74,7 @@ describe('parseAirportsCsv', () => {
 
   it('parses the pinned source schema, where IATA codes are named code', () => {
     const csv = [
-      'code,icao,name,latitude,longitude,elevation,url,time_zone,city_code,country,city,state,county,type',
+      '\uFEFF code ,icao,name,latitude,longitude,elevation,url,time_zone,city_code,country, city ,state,county,type',
       'ABQ,KABQ,Albuquerque International Sunport,35.0402,-106.609,5355,,America/Denver,ABQ,US,Albuquerque,NM,Bernalillo,large_airport',
     ].join('\n')
 

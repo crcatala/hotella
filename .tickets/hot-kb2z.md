@@ -19,3 +19,7 @@ Add a maintainer command to validate and pin the latest immutable Airports datas
 **2026-07-17T12:45:32Z**
 
 Implemented an IATA refresh command that resolves and validates the latest immutable upstream commit, updates the pin, and prints PR-review next steps. Added maintainer workflow documentation and removed test coupling to a specific revision.
+
+**2026-07-17T12:51:04Z**
+
+Addressed refresh-workflow review findings: runtime and refresh validation now normalize BOM/whitespace headers; refresh output compares old/new mappings (added, removed, city-name changes) and links the upstream diff; added focused validation/comparison tests.

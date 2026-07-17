@@ -125,7 +125,7 @@ export function parseAirportsCsv(csv: string): Record<string, string> {
 
   const header = lines[0]
   // Parse header to find column indices
-  const cols = parseCsvLine(header)
+  const cols = parseCsvLine(header).map((column) => column.trim().replace(/^\uFEFF/, ''))
   // The pinned source calls its IATA column "code"; accept the conventional
   // "iata" name too for compatible source snapshots and cached data.
   const iataIdx = cols.findIndex((c) => ['iata', 'code'].includes(c.toLowerCase()))
