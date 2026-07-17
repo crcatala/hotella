@@ -60,7 +60,16 @@ const checks: CheckConfig[] = [
   },
   {
     name: 'Format',
-    command: ['pnpm', 'exec', 'prettier', '--check', 'src/**/*.ts'],
+    command: [
+      'pnpm',
+      'exec',
+      'prettier',
+      '--check',
+      'src/**/*.ts',
+      'tests/**/*.ts',
+      'scripts/**/*.mjs',
+      'README.md',
+    ],
     verboseHint: 'pnpm run format:check:verbose',
   },
   {

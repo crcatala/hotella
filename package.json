@@ -48,9 +48,9 @@
     "lint:fix": "oxlint --fix src/",
     "lint:verbose": "oxlint src/",
     "format": "bash scripts/check.sh format-fix",
-    "format:verbose": "prettier --write \"src/**/*.ts\"",
+    "format:verbose": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\" \"scripts/**/*.mjs\" README.md",
     "format:check": "bash scripts/check.sh format",
-    "format:check:verbose": "prettier --check \"src/**/*.ts\"",
+    "format:check:verbose": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\" \"scripts/**/*.mjs\" README.md",
     "typecheck": "bash scripts/check.sh typecheck",
     "typecheck:verbose": "tsgo --noEmit",
     "verify": "pnpm exec tsx scripts/verify.ts",
@@ -60,7 +60,8 @@
     "prepublishOnly": "pnpm run verify",
     "release": "release-it",
     "release:dry": "release-it --dry-run --no-npm --no-github",
-    "release:prep": "bash scripts/prep-release.sh"
+    "release:prep": "bash scripts/prep-release.sh",
+    "iata:refresh": "node scripts/refresh-iata-data.mjs"
   },
   "dependencies": {
     "cheerio": "^1.2.0",
