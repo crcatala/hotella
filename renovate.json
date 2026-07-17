@@ -39,6 +39,13 @@
       ]
     },
     {
+      "description": "Keep Node 22 declarations while Node 22 remains supported",
+      "matchPackageNames": [
+        "@types/node"
+      ],
+      "allowedVersions": "<24"
+    },
+    {
       "description": "Never automerge major updates; require human review",
       "matchUpdateTypes": [
         "major"
