@@ -44,14 +44,15 @@ Preview the local release steps first:
 pnpm run release:dry
 ```
 
-`release:dry` disables npm publishing and GitHub Release creation. Then release interactively:
+`release:dry` disables npm publishing and GitHub Release creation. Then release interactively. For the initial `0.1.0` release, use the dedicated command; later releases use the normal command:
 
 ```bash
 export GITHUB_TOKEN=github_pat_... # if not already configured
-pnpm run release
+pnpm run release:first # publishes v0.1.0
+pnpm run release       # subsequent releases
 ```
 
-Release-it validates main, updates the version and changelog, rebuilds and smoke-tests the package, commits and tags `vX.Y.Z`, publishes `hotella` with public access, pushes the commit and tag, and creates the GitHub Release.
+The initial-release command explicitly keeps the pre-seeded package version so release-it can create the `v0.1.0` commit, tag, and GitHub Release. Release-it validates main, updates the changelog and version as applicable, rebuilds and smoke-tests the package, publishes `hotella` with public access, pushes the commit and tag, and creates the GitHub Release.
 
 ## Verify the release
 

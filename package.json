@@ -34,7 +34,8 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "build": "tsgo",
+    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+    "build": "pnpm run clean && tsgo",
     "dev": "tsx src/cli.ts",
     "test": "bash scripts/check.sh test",
     "test:verbose": "bash scripts/test-unit.sh",
@@ -58,6 +59,7 @@
     "prepare": "lefthook install || true",
     "prepublishOnly": "pnpm run verify",
     "release": "release-it",
+    "release:first": "release-it 0.1.0 --npm.allowSameVersion",
     "release:dry": "release-it --dry-run --no-npm --no-github",
     "release:prep": "bash scripts/prep-release.sh"
   },

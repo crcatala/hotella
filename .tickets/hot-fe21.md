@@ -20,3 +20,7 @@ Starting follow-up release hardening: maintainer-only contribution policy, docum
 **2026-07-17T02:05:53Z**
 
 Implemented release hardening on chore/release-hardening: package-install smoke test is now part of verify/CI; release docs and prep/dry-run scripts added; release-it now requires a clean main checkout and pushes tags; initial changelog entries are under Unreleased; contribution policy now matches raindrop-cli and ticktick-cli. Validation: pnpm run verify passed.
+
+**2026-07-17T03:59:09Z**
+
+Addressed PR #23 review findings: added a clean-before-build workflow to prevent stale dist artifacts, serialized package smoke verification after test/build writers, and added a release:first command/docs for the initial v0.1.0 publish.
