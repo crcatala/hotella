@@ -212,7 +212,7 @@ The whole pipeline runs in ~0.3s — a single HTTP request with no browser overh
 ### Setup
 
 ```bash
-git clone https://github.com/your-username/hotella.git
+git clone https://github.com/crcatala/hotella.git
 cd hotella
 pnpm install
 ```
@@ -285,13 +285,11 @@ scripts/
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b my-feature`
-3. Make your changes and ensure `pnpm run verify` passes
-4. Commit with a descriptive message
-5. Open a pull request
+Hotella is personally maintained and is not accepting code contributions, pull requests, or feature requests. Bug reports with a clear reproduction are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
-Please keep changes focused and include tests for new functionality.
+## Releasing
+
+Maintainers can follow [RELEASING.md](RELEASING.md) for the manual release process.
 
 ## License
 

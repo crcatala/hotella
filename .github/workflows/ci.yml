@@ -8,7 +8,7 @@ on:
 
 jobs:
   verify:
-    name: Lint, Typecheck, Test, Build (Node ${{ matrix.node-version }})
+    name: Verify package (Node ${{ matrix.node-version }})
     runs-on: ubicloud-standard-2
     strategy:
       matrix:
@@ -26,5 +26,5 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Verify (lint, typecheck, format, test, build)
+      - name: Verify (tests, lint, typecheck, format, build, package smoke test)
         run: pnpm run verify

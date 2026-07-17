@@ -63,6 +63,11 @@ const checks: CheckConfig[] = [
     command: ['pnpm', 'exec', 'prettier', '--check', 'src/**/*.ts'],
     verboseHint: 'pnpm run format:check:verbose',
   },
+  {
+    name: 'Package',
+    command: ['pnpm', 'run', 'test:package'],
+    verboseHint: 'pnpm run test:package',
+  },
 ]
 
 async function runCheckSimple(config: CheckConfig): Promise<CheckResult> {

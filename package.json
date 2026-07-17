@@ -54,9 +54,12 @@
     "typecheck:verbose": "tsgo --noEmit",
     "verify": "pnpm exec tsx scripts/verify.ts",
     "verify:verbose": "VERBOSE=1 pnpm exec tsx scripts/verify.ts",
+    "test:package": "pnpm run build && bash scripts/test-package.sh",
     "prepare": "lefthook install || true",
-    "prepublishOnly": "pnpm run verify && pnpm run build",
-    "release": "release-it"
+    "prepublishOnly": "pnpm run verify",
+    "release": "release-it",
+    "release:dry": "release-it --dry-run --no-npm --no-github",
+    "release:prep": "bash scripts/prep-release.sh"
   },
   "dependencies": {
     "cheerio": "^1.0.0",
@@ -80,6 +83,9 @@
   },
   "engines": {
     "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "packageManager": "pnpm@11.8.0"
 }
