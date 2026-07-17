@@ -32,3 +32,7 @@ Improving release:prep with strict clean-tree detection, optional base revision,
 **2026-07-17T11:29:35Z**
 
 Updated scripts/prep-release.sh: strict porcelain clean check (including untracked files), optional validated base ref, explicit empty-range output, diff stat, and copyable Keep a Changelog AI prompt. Validated syntax and clean/invalid-ref/untracked scenarios in a temporary git repository.
+
+**2026-07-17T11:41:41Z**
+
+Opened PR #27 for the release:prep reporting improvements: https://github.com/crcatala/hotella/pull/27
