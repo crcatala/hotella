@@ -4,6 +4,8 @@ Search hotel prices and availability from the terminal via Google Hotels.
 
 Compare prices from Booking.com, Expedia, Hotels.com, and direct hotel sites in a single command.
 
+> **Unofficial scraper:** hotella is not affiliated with, endorsed by, or supported by Google. It retrieves publicly available Google Hotels pages, so results may be incomplete, inaccurate, rate-limited, or stop working when Google changes its site. Searches send your requested location and travel dates to Google, which also receives your IP address. You are responsible for ensuring your use complies with applicable terms and laws.
+
 ## Quick Start
 
 ```bash

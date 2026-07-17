@@ -2,7 +2,9 @@ import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'no
 import { homedir } from 'node:os'
 import { dirname, join } from 'node:path'
 
-const CSV_URL = 'https://raw.githubusercontent.com/lxndrblz/Airports/refs/heads/main/airports.csv'
+// Pinned to an immutable upstream commit so a changed branch cannot alter runtime data.
+const CSV_URL =
+  'https://raw.githubusercontent.com/lxndrblz/Airports/d1907e811e38a141a3ccace73527248a19ba11af/airports.csv'
 const CACHE_DIR = join(homedir(), '.cache', 'hotella')
 const CACHE_FILE = join(CACHE_DIR, 'airports.csv')
 const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000 // 7 days
