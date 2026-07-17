@@ -120,8 +120,10 @@ async function main() {
   if (!match) throw new Error(`Could not find AIRPORTS_DATA_REVISION in ${SOURCE_FILE}.`)
 
   const previousRevision = match[2]
+  let reviewStep
   if (previousRevision === sha) {
     console.log(`Airport dataset is already pinned to ${sha} (${airportCount} mappings).`)
+    reviewStep = 'No revision update was needed; review the reported mapping count.'
   } else {
     const previousResponse = await fetchOrThrow(
       `https://raw.githubusercontent.com/${REPOSITORY}/${previousRevision}/airports.csv`,
@@ -136,9 +138,10 @@ async function main() {
       `Dataset comparison: ${changes.added} added, ${changes.removed} removed, ${changes.cityChanged} city names changed.`,
     )
     console.log(`Upstream diff: https://github.com/${REPOSITORY}/compare/${previousRevision}...${sha}`)
+    reviewStep = 'Review the revision, mapping summary, and upstream diff above.'
   }
 
-  console.log(`\nNext steps:\n  1. Review the revision, mapping summary, and upstream diff above.\n  2. Run: pnpm run verify\n  3. Commit the revision update on a dedicated branch and open a PR for review.\n\nWatch for upstream schema changes, unexpectedly low mapping counts, and city-name changes that could alter search locations.`)
+  console.log(`\nNext steps:\n  1. ${reviewStep}\n  2. Run: pnpm run verify\n  3. Commit the revision update on a dedicated branch and open a PR for review.\n\nWatch for upstream schema changes, unexpectedly low mapping counts, and city-name changes that could alter search locations.`)
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
