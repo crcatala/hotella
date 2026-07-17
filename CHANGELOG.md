@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- IATA dataset refresh workflow for updating airport and airline data (hot-kb2z).
+
+### Fixed
+
+- Clearer guidance and validation for IATA dataset refreshes (hot-kb2z).
+
 ## [0.1.2] - 2026-07-17
 
 ### Changed
