@@ -1,5 +1,17 @@
 name: Live Tests
 
+# Maintainer-only live tests.
+#
+# Trigger: issue_comment `/run-live-tests` on a same-repo PR.
+# Workflow always runs from the default branch; only the PR head SHA is checked out.
+#
+# Security model:
+# - Only the repository owner can trigger
+# - Fork PRs are rejected
+# - The job that executes PR-controlled code has contents:read only (no write token)
+# - Report job posts checks/comments and does not check out PR code
+# - triggering_actor is re-checked so collaborators cannot re-run an owner-approved job
+
 on:
   issue_comment:
     types: [created]
@@ -38,7 +50,7 @@ jobs:
               return;
             }
 
-            core.setOutput('number', pr.data.number);
+            core.setOutput('number', String(pr.data.number));
             core.setOutput('sha', pr.data.head.sha);
 
   test:
@@ -72,7 +84,20 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run live tests
+        id: tests
         run: pnpm run test:live:verbose
+
+      - name: Test summary
+        if: always()
+        run: |
+          {
+            echo "## Live Test Results"
+            if [ "${{ steps.tests.outcome }}" = "success" ]; then
+              echo "✅ All live tests passed"
+            else
+              echo "❌ Some live tests failed"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
 
   report:
     name: Report Live Test Result
@@ -103,6 +128,7 @@ jobs:
             const passed = conclusion === 'success';
             const sha = '${{ needs.prepare.outputs.pr_sha }}';
             const logsUrl = '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}';
+            const body = `${passed ? '✅ Live tests passed.' : '❌ Live tests failed.'} Tested commit: \`${sha}\`. [View logs](${logsUrl})`;
 
             await github.rest.checks.create({
               owner: context.repo.owner,
@@ -122,5 +148,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: Number('${{ needs.prepare.outputs.pr_number }}'),
-              body: `${passed ? '✅ Live tests passed.' : '❌ Live tests failed.'} Tested commit: \`${sha}\`. [View logs](${logsUrl})`,
+              body,
             });
