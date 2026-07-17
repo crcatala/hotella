@@ -1,6 +1,6 @@
 {
   "name": "hotella",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Search hotel prices and availability from the terminal via Google Hotels",
   "license": "MIT",
   "author": "crcatala",
