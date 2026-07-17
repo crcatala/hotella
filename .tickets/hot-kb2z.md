@@ -23,3 +23,7 @@ Implemented an IATA refresh command that resolves and validates the latest immut
 **2026-07-17T12:51:04Z**
 
 Addressed refresh-workflow review findings: runtime and refresh validation now normalize BOM/whitespace headers; refresh output compares old/new mappings (added, removed, city-name changes) and links the upstream diff; added focused validation/comparison tests.
+
+**2026-07-17T13:11:10Z**
+
+Added mocked command-flow coverage for dirty worktree, revision update, and no-op behavior; expanded formatting checks to scripts, tests, and README. Validation: pnpm run format, pnpm test, pnpm run verify.

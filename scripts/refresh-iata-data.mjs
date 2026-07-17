@@ -34,15 +34,16 @@ export function parseCsvLine(line) {
   return fields
 }
 
-function requireCleanWorktree() {
-  const status = execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8' })
-  if (status) {
+export function requireCleanWorktree(
+  getWorktreeStatus = () => execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8' }),
+) {
+  if (getWorktreeStatus()) {
     throw new Error('The working tree must be clean before refreshing the airport dataset.')
   }
 }
 
-async function fetchOrThrow(url, options) {
-  const response = await fetch(url, options)
+async function fetchOrThrow(url, options, fetchFn = fetch) {
+  const response = await fetchFn(url, options)
   if (!response.ok) {
     throw new Error(`Request failed (${response.status} ${response.statusText}): ${url}`)
   }
@@ -52,7 +53,10 @@ async function fetchOrThrow(url, options) {
 export function validateDataset(csv, minimumAirports = MINIMUM_AIRPORTS) {
   const lines = csv.split(/\r?\n/)
   const columns = parseCsvLine(lines[0] ?? '').map((column) =>
-    column.trim().replace(/^\uFEFF/, '').toLowerCase(),
+    column
+      .trim()
+      .replace(/^\uFEFF/, '')
+      .toLowerCase(),
   )
   const codeIndex = columns.findIndex((column) => column === 'iata' || column === 'code')
   const cityIndex = columns.findIndex((column) => column === 'city')
@@ -95,8 +99,16 @@ export function summarizeDatasetChanges(previous, next) {
   return { added, removed, cityChanged }
 }
 
-async function main() {
-  requireCleanWorktree()
+export async function refreshIataData({
+  fetchFn = fetch,
+  getWorktreeStatus,
+  log = console.log,
+  minimumAirports = MINIMUM_AIRPORTS,
+  readFileFn = readFile,
+  sourceFile = SOURCE_FILE,
+  writeFileFn = writeFile,
+} = {}) {
+  requireCleanWorktree(getWorktreeStatus)
 
   const headers = { Accept: 'application/vnd.github+json' }
   if (process.env.GITHUB_TOKEN) headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`
@@ -104,48 +116,55 @@ async function main() {
   const commitResponse = await fetchOrThrow(
     `https://api.github.com/repos/${REPOSITORY}/commits/${BRANCH}`,
     { headers },
+    fetchFn,
   )
   const { sha } = await commitResponse.json()
   if (!/^[a-f0-9]{40}$/.test(sha)) throw new Error('Upstream returned an invalid commit SHA.')
 
   const csvResponse = await fetchOrThrow(
     `https://raw.githubusercontent.com/${REPOSITORY}/${sha}/airports.csv`,
+    undefined,
+    fetchFn,
   )
   const csv = await csvResponse.text()
-  const { codeColumn, airportCount } = validateDataset(csv)
+  const { codeColumn, airportCount } = validateDataset(csv, minimumAirports)
 
-  const source = await readFile(SOURCE_FILE, 'utf8')
+  const source = await readFileFn(sourceFile, 'utf8')
   const revisionPattern = /(export const AIRPORTS_DATA_REVISION = )'([a-f0-9]{40})'/
   const match = source.match(revisionPattern)
-  if (!match) throw new Error(`Could not find AIRPORTS_DATA_REVISION in ${SOURCE_FILE}.`)
+  if (!match) throw new Error(`Could not find AIRPORTS_DATA_REVISION in ${sourceFile}.`)
 
   const previousRevision = match[2]
   let reviewStep
   if (previousRevision === sha) {
-    console.log(`Airport dataset is already pinned to ${sha} (${airportCount} mappings).`)
+    log(`Airport dataset is already pinned to ${sha} (${airportCount} mappings).`)
     reviewStep = 'No revision update was needed; review the reported mapping count.'
   } else {
     const previousResponse = await fetchOrThrow(
       `https://raw.githubusercontent.com/${REPOSITORY}/${previousRevision}/airports.csv`,
+      undefined,
+      fetchFn,
     )
-    const previousDataset = validateDataset(await previousResponse.text())
-    const changes = summarizeDatasetChanges(previousDataset, validateDataset(csv))
+    const previousDataset = validateDataset(await previousResponse.text(), minimumAirports)
+    const changes = summarizeDatasetChanges(previousDataset, validateDataset(csv, minimumAirports))
 
-    await writeFile(SOURCE_FILE, source.replace(revisionPattern, `$1'${sha}'`))
-    console.log(`Updated airport dataset revision: ${previousRevision} → ${sha}`)
-    console.log(`Validated ${airportCount} airport mappings using the "${codeColumn}" column.`)
-    console.log(
+    await writeFileFn(sourceFile, source.replace(revisionPattern, `$1'${sha}'`))
+    log(`Updated airport dataset revision: ${previousRevision} → ${sha}`)
+    log(`Validated ${airportCount} airport mappings using the "${codeColumn}" column.`)
+    log(
       `Dataset comparison: ${changes.added} added, ${changes.removed} removed, ${changes.cityChanged} city names changed.`,
     )
-    console.log(`Upstream diff: https://github.com/${REPOSITORY}/compare/${previousRevision}...${sha}`)
+    log(`Upstream diff: https://github.com/${REPOSITORY}/compare/${previousRevision}...${sha}`)
     reviewStep = 'Review the revision, mapping summary, and upstream diff above.'
   }
 
-  console.log(`\nNext steps:\n  1. ${reviewStep}\n  2. Run: pnpm run verify\n  3. Commit the revision update on a dedicated branch and open a PR for review.\n\nWatch for upstream schema changes, unexpectedly low mapping counts, and city-name changes that could alter search locations.`)
+  log(
+    `\nNext steps:\n  1. ${reviewStep}\n  2. Run: pnpm run verify\n  3. Commit the revision update on a dedicated branch and open a PR for review.\n\nWatch for upstream schema changes, unexpectedly low mapping counts, and city-name changes that could alter search locations.`,
+  )
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main().catch((error) => {
+  refreshIataData().catch((error) => {
     console.error(`IATA dataset refresh failed: ${error.message}`)
     process.exitCode = 1
   })

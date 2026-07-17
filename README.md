@@ -106,43 +106,43 @@ hotella search [options] <location>
 ### Arguments
 
 | Argument   | Description                               |
-|------------|-------------------------------------------|
+| ---------- | ----------------------------------------- |
 | `location` | City name, location, or IATA airport code |
 
 ### Options
 
-| Flag               | Default   | Description                                     |
-|--------------------|-----------|-------------------------------------------------|
-| `--checkin <date>` | required  | Check-in date (YYYY-MM-DD)                      |
-| `--checkout <date>`| required  | Check-out date (YYYY-MM-DD)                     |
-| `--adults <n>`     | `2`       | Number of adults (1–9)                           |
-| `--children <n>`   | `0`       | Number of children (0–8)                         |
-| `--sort <mode>`    | `value`   | `price-asc`, `price-desc`, `rating`, `value`    |
-| `--limit <n>`      | `20`      | Max results to show                              |
-| `--min-price <n>`  | —         | Minimum price per night                          |
-| `--max-price <n>`  | —         | Maximum price per night                          |
-| `--min-rating <n>` | —         | Minimum rating (0–5)                             |
-| `--currency <code>`| `USD`     | Currency code: USD, EUR, GBP, JPY, TWD           |
-| `--browser <type>` | `chrome`  | Browser to impersonate: `chrome` or `firefox`    |
+| Flag                | Default  | Description                                   |
+| ------------------- | -------- | --------------------------------------------- |
+| `--checkin <date>`  | required | Check-in date (YYYY-MM-DD)                    |
+| `--checkout <date>` | required | Check-out date (YYYY-MM-DD)                   |
+| `--adults <n>`      | `2`      | Number of adults (1–9)                        |
+| `--children <n>`    | `0`      | Number of children (0–8)                      |
+| `--sort <mode>`     | `value`  | `price-asc`, `price-desc`, `rating`, `value`  |
+| `--limit <n>`       | `20`     | Max results to show                           |
+| `--min-price <n>`   | —        | Minimum price per night                       |
+| `--max-price <n>`   | —        | Maximum price per night                       |
+| `--min-rating <n>`  | —        | Minimum rating (0–5)                          |
+| `--currency <code>` | `USD`    | Currency code: USD, EUR, GBP, JPY, TWD        |
+| `--browser <type>`  | `chrome` | Browser to impersonate: `chrome` or `firefox` |
 
 ### Global Options
 
-| Flag        | Description                                 |
-|-------------|---------------------------------------------|
-| `--json`    | Structured JSON output                      |
-| `--plain`   | Human-readable list output                  |
-| `--table`   | Aligned columnar table output               |
-| `--verbose` | Show operational progress                   |
-| `--debug`   | Show debug information (implies `--verbose`)|
-| `--no-color`| Disable colors                              |
-| `--version` | Show version number                         |
-| `--help`    | Show help                                   |
+| Flag         | Description                                  |
+| ------------ | -------------------------------------------- |
+| `--json`     | Structured JSON output                       |
+| `--plain`    | Human-readable list output                   |
+| `--table`    | Aligned columnar table output                |
+| `--verbose`  | Show operational progress                    |
+| `--debug`    | Show debug information (implies `--verbose`) |
+| `--no-color` | Disable colors                               |
+| `--version`  | Show version number                          |
+| `--help`     | Show help                                    |
 
 ### Environment Variables
 
-| Variable   | Description                                          |
-|------------|------------------------------------------------------|
-| `NO_COLOR` | Disable all color output (see https://no-color.org)  |
+| Variable   | Description                                         |
+| ---------- | --------------------------------------------------- |
+| `NO_COLOR` | Disable all color output (see https://no-color.org) |
 
 ## Output Formats
 
