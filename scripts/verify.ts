@@ -63,6 +63,11 @@ const checks: CheckConfig[] = [
     command: ['pnpm', 'exec', 'prettier', '--check', 'src/**/*.ts'],
     verboseHint: 'pnpm run format:check:verbose',
   },
+  {
+    name: 'Package',
+    command: ['pnpm', 'run', 'test:package'],
+    verboseHint: 'pnpm run test:package',
+  },
 ]
 
 async function runCheckSimple(config: CheckConfig): Promise<CheckResult> {
@@ -121,10 +126,11 @@ function printResult(result: CheckResult) {
 
 async function runWithTasuku(): Promise<CheckResult[]> {
   const results: CheckResult[] = []
+  const packageCheck = checks.at(-1)!
 
   await task.group(
     (t) =>
-      checks.map((check) =>
+      checks.slice(0, -1).map((check) =>
         t(check.name, async ({ setStatus, setError }) => {
           const result = await runCheckWithStatus(check, setStatus)
           results.push(result)
@@ -138,6 +144,16 @@ async function runWithTasuku(): Promise<CheckResult[]> {
       concurrency: Infinity,
       stopOnError: false,
     },
+  )
+
+  await task(packageCheck.name, ({ setError }) =>
+    runCheckSimple(packageCheck).then((result) => {
+      results.push(result)
+      if (!result.success) {
+        setError(new Error('failed'))
+      }
+      return result
+    }),
   )
 
   results.sort(
@@ -155,7 +171,9 @@ async function runWithTasuku(): Promise<CheckResult[]> {
 
 async function runSimple(): Promise<CheckResult[]> {
   console.log('Verifying...')
-  const results = await Promise.all(checks.map((check) => runCheckSimple(check)))
+  const packageCheck = checks.at(-1)!
+  const results = await Promise.all(checks.slice(0, -1).map((check) => runCheckSimple(check)))
+  results.push(await runCheckSimple(packageCheck))
   console.log('')
   for (const result of results) {
     printResult(result)

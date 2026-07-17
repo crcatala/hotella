@@ -2,8 +2,11 @@
   "$schema": "https://unpkg.com/release-it/schema/release-it.json",
   "git": {
     "requireBranch": "main",
+    "requireCleanWorkingDir": true,
     "commitMessage": "chore(release): v${version}",
-    "tagName": "v${version}"
+    "tagName": "v${version}",
+    "push": true,
+    "pushArgs": ["--follow-tags"]
   },
   "github": {
     "release": true,
@@ -16,7 +19,7 @@
   },
   "hooks": {
     "before:init": "pnpm run verify",
-    "after:bump": "pnpm run build"
+    "after:bump": "pnpm run test:package"
   },
   "plugins": {
     "@release-it/keep-a-changelog": {
