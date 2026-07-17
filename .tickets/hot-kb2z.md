@@ -1,6 +1,6 @@
 ---
 id: hot-kb2z
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-07-17T12:44:01Z
