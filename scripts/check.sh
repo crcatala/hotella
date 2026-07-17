@@ -37,10 +37,10 @@ case "$cmd" in
     run_silent "Typecheck" "pnpm exec tsgo --noEmit $extra_args" "pnpm run typecheck:verbose"
     ;;
   format)
-    run_silent "Format" "pnpm exec prettier --check 'src/**/*.ts' $extra_args" "pnpm run format:check:verbose"
+    run_silent "Format" "pnpm exec prettier --check 'src/**/*.ts' 'tests/**/*.ts' 'scripts/**/*.mjs' README.md $extra_args" "pnpm run format:check:verbose"
     ;;
   format-fix)
-    run_silent "Format (fix)" "pnpm exec prettier --write 'src/**/*.ts' $extra_args" "pnpm run format:verbose"
+    run_silent "Format (fix)" "pnpm exec prettier --write 'src/**/*.ts' 'tests/**/*.ts' 'scripts/**/*.mjs' README.md $extra_args" "pnpm run format:verbose"
     ;;
   *)
     echo "Usage: $0 {test|test:live|test:all|lint|typecheck|format|format-fix} [extra args...]"

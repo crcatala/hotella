@@ -3,12 +3,12 @@ import { homedir } from 'node:os'
 import { dirname, join } from 'node:path'
 
 // Pinned to an immutable upstream commit so a changed branch cannot alter runtime data.
-const CSV_REVISION = 'd1907e811e38a141a3ccace73527248a19ba11af'
-const CSV_URL = `https://raw.githubusercontent.com/lxndrblz/Airports/${CSV_REVISION}/airports.csv`
+export const AIRPORTS_DATA_REVISION = 'd1907e811e38a141a3ccace73527248a19ba11af'
+const CSV_URL = `https://raw.githubusercontent.com/lxndrblz/Airports/${AIRPORTS_DATA_REVISION}/airports.csv`
 const CACHE_DIR = join(homedir(), '.cache', 'hotella')
 // Keep caches scoped to the immutable source revision. This intentionally ignores
 // the legacy airports.csv cache, which may have been downloaded from main.
-const CACHE_FILE = join(CACHE_DIR, `airports-${CSV_REVISION}.csv`)
+const CACHE_FILE = join(CACHE_DIR, `airports-${AIRPORTS_DATA_REVISION}.csv`)
 const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000 // 7 days
 
 /**
@@ -125,7 +125,7 @@ export function parseAirportsCsv(csv: string): Record<string, string> {
 
   const header = lines[0]
   // Parse header to find column indices
-  const cols = parseCsvLine(header)
+  const cols = parseCsvLine(header).map((column) => column.trim().replace(/^\uFEFF/, ''))
   // The pinned source calls its IATA column "code"; accept the conventional
   // "iata" name too for compatible source snapshots and cached data.
   const iataIdx = cols.findIndex((c) => ['iata', 'code'].includes(c.toLowerCase()))
