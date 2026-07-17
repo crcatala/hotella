@@ -1,6 +1,6 @@
-import { existsSync, rmSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   FALLBACK_AIRPORTS,
@@ -9,7 +9,9 @@ import {
   resolveLocation,
 } from '../../src/lib/iata.js'
 
-const CACHE_FILE = join(homedir(), '.cache', 'hotella', 'airports.csv')
+const CACHE_DIR = join(homedir(), '.cache', 'hotella')
+const CACHE_FILE = join(CACHE_DIR, 'airports-d1907e811e38a141a3ccace73527248a19ba11af.csv')
+const LEGACY_CACHE_FILE = join(CACHE_DIR, 'airports.csv')
 
 describe('isIataCode', () => {
   it('returns true for 3 uppercase letters', () => {
@@ -69,6 +71,15 @@ describe('parseAirportsCsv', () => {
     expect(parseAirportsCsv('foo,bar\n1,2')).toEqual({})
   })
 
+  it('parses the pinned source schema, where IATA codes are named code', () => {
+    const csv = [
+      'code,icao,name,latitude,longitude,elevation,url,time_zone,city_code,country,city,state,county,type',
+      'ABQ,KABQ,Albuquerque International Sunport,35.0402,-106.609,5355,,America/Denver,ABQ,US,Albuquerque,NM,Bernalillo,large_airport',
+    ].join('\n')
+
+    expect(parseAirportsCsv(csv)).toMatchObject({ ABQ: 'Albuquerque' })
+  })
+
   it('skips lines without valid IATA codes', () => {
     const csv = 'iata,city\n,SomeCity\n12,OtherCity\nABC,ValidCity'
     const mapping = parseAirportsCsv(csv)
@@ -92,21 +103,20 @@ describe('FALLBACK_AIRPORTS', () => {
 })
 
 describe('resolveLocation', () => {
-  let cachedContent: string | null = null
+  const cachedContent = new Map<string, string | null>()
 
   const mockCsv = [
-    'icao,iata,name,city,subd,country,elevation,lat,lon,tz,lid',
-    'RJAA,NRT,"Narita International Airport","Narita","Chiba","JP",135,35.764702,140.386002,Asia/Tokyo,',
-    'RCTP,TPE,"Taiwan Taoyuan International Airport","Taoyuan City","Taoyuan","TW",106,25.0777,121.233002,Asia/Taipei,',
-    'LFPG,CDG,"Charles de Gaulle International Airport","Roissy-en-France","Île-de-France","FR",119,49.012798,2.55,Europe/Paris,',
+    'code,icao,name,latitude,longitude,elevation,url,time_zone,city_code,country,city,state,county,type',
+    'NRT,RJAA,Narita International Airport,35.764702,140.386002,135,,Asia/Tokyo,NRT,JP,Narita,Chiba,,large_airport',
+    'TPE,RCTP,Taiwan Taoyuan International Airport,25.0777,121.233002,106,,Asia/Taipei,TPE,TW,Taoyuan City,Taoyuan,,large_airport',
+    'CDG,LFPG,Charles de Gaulle International Airport,49.012798,2.55,119,,Europe/Paris,CDG,FR,Roissy-en-France,Île-de-France,,large_airport',
+    'ABQ,KABQ,Albuquerque International Sunport,35.0402,-106.609,5355,,America/Denver,ABQ,US,Albuquerque,NM,Bernalillo,large_airport',
   ].join('\n')
 
   beforeEach(() => {
-    // Save existing cache if present
-    if (existsSync(CACHE_FILE)) {
-      const { readFileSync } = require('node:fs')
-      cachedContent = readFileSync(CACHE_FILE, 'utf-8')
-      rmSync(CACHE_FILE, { force: true })
+    for (const cacheFile of [CACHE_FILE, LEGACY_CACHE_FILE]) {
+      cachedContent.set(cacheFile, existsSync(cacheFile) ? readFileSync(cacheFile, 'utf-8') : null)
+      rmSync(cacheFile, { force: true })
     }
 
     vi.stubGlobal(
@@ -120,16 +130,15 @@ describe('resolveLocation', () => {
 
   afterEach(() => {
     vi.restoreAllMocks()
-    // Clean up cache file written during test
-    rmSync(CACHE_FILE, { force: true })
-    // Restore original cache if it existed
-    if (cachedContent !== null) {
-      const { mkdirSync, writeFileSync } = require('node:fs')
-      const { dirname } = require('node:path')
-      mkdirSync(dirname(CACHE_FILE), { recursive: true })
-      writeFileSync(CACHE_FILE, cachedContent, 'utf-8')
-      cachedContent = null
+    for (const cacheFile of [CACHE_FILE, LEGACY_CACHE_FILE]) {
+      rmSync(cacheFile, { force: true })
+      const content = cachedContent.get(cacheFile)
+      if (content !== null && content !== undefined) {
+        mkdirSync(dirname(cacheFile), { recursive: true })
+        writeFileSync(cacheFile, content, 'utf-8')
+      }
     }
+    cachedContent.clear()
   })
 
   it('resolves IATA code to city name', async () => {
@@ -161,6 +170,17 @@ describe('resolveLocation', () => {
     const result = await resolveLocation('ZZZ')
     expect(result.resolved).toBe('ZZZ')
     expect(result.wasIata).toBe(false)
+  })
+
+  it('ignores a legacy cache downloaded from the mutable source', async () => {
+    mkdirSync(CACHE_DIR, { recursive: true })
+    writeFileSync(LEGACY_CACHE_FILE, 'iata,city\nABQ,Incorrect legacy value', 'utf-8')
+
+    const result = await resolveLocation('ABQ')
+
+    expect(fetch).toHaveBeenCalledOnce()
+    expect(result.resolved).toBe('Albuquerque')
+    expect(result.wasIata).toBe(true)
   })
 
   it('uses fallback when fetch fails', async () => {

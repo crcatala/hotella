@@ -43,3 +43,7 @@ Audit remediations complete locally: Cheerio updated to 1.2.0 / undici 7.28.0 an
 **2026-07-17T11:41:41Z**
 
 Opened PR #27 for the release:prep reporting improvements: https://github.com/crcatala/hotella/pull/27
+
+**2026-07-17T12:09:52Z**
+
+Fixed PR #28 review findings: parser now supports the pinned Airports dataset's code column; caches are revision-scoped so legacy mutable-source data is ignored; tests cover both behaviors. Verification passed (pnpm run verify; direct pinned-source parse: 6,821 mappings including ABQ).
