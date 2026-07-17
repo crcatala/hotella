@@ -86,7 +86,8 @@ jobs:
     runs-on: ubicloud-standard-2
     permissions:
       checks: write
-      issues: write
+      # PR comments use the issues comments API but require pull-requests write.
+      pull-requests: write
 
     steps:
       - name: Create check and comment on PR
