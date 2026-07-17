@@ -59,12 +59,11 @@
     "prepare": "lefthook install || true",
     "prepublishOnly": "pnpm run verify",
     "release": "release-it",
-    "release:first": "release-it 0.1.0 --npm.allowSameVersion",
     "release:dry": "release-it --dry-run --no-npm --no-github",
     "release:prep": "bash scripts/prep-release.sh"
   },
   "dependencies": {
-    "cheerio": "^1.0.0",
+    "cheerio": "^1.2.0",
     "commander": "^14.0.0",
     "impit": "^0.14.0",
     "kleur": "^4.1.5",

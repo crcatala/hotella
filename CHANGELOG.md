@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Updated Cheerio and its transitive `undici` dependency to remediate reported vulnerabilities.
+- Pinned the remote airport dataset to an immutable upstream commit.
+- Documented Google Hotels scraping, privacy, and reliability limitations.
+- Restricted CI workflow permissions to read-only repository contents.
+
 ## [0.1.1] - 2026-07-17
 
 ### Changed

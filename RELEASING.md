@@ -26,7 +26,7 @@ Hotella uses [release-it](https://github.com/release-it/release-it) for manual r
    pnpm run release:prep
    ```
 
-   Add user-facing entries under `## [Unreleased]` in `CHANGELOG.md`, using [Keep a Changelog](https://keepachangelog.com/) sections such as Added, Changed, Fixed, Removed, or Security. For the first release, keep the initial feature list under `Unreleased`; release-it will create the dated `0.1.0` section.
+   Add user-facing entries under `## [Unreleased]` in `CHANGELOG.md`, using [Keep a Changelog](https://keepachangelog.com/) sections such as Added, Changed, Fixed, Removed, or Security.
 
 3. Run the full verification suite:
 
@@ -44,15 +44,14 @@ Preview the local release steps first:
 pnpm run release:dry
 ```
 
-`release:dry` disables npm publishing and GitHub Release creation. Then release interactively. For the initial `0.1.0` release, use the dedicated command; later releases use the normal command:
+`release:dry` disables npm publishing and GitHub Release creation. Then release interactively:
 
 ```bash
 export GITHUB_TOKEN=github_pat_... # if not already configured
-pnpm run release:first # publishes v0.1.0
-pnpm run release       # subsequent releases
+pnpm run release
 ```
 
-The initial-release command explicitly keeps the pre-seeded package version so release-it can create the `v0.1.0` commit, tag, and GitHub Release. Release-it validates main, updates the changelog and version as applicable, rebuilds and smoke-tests the package, publishes `hotella` with public access, pushes the commit and tag, and creates the GitHub Release.
+Release-it validates main, updates the changelog and version, rebuilds and smoke-tests the package, publishes `hotella` with public access, pushes the commit and tag, and creates the GitHub Release.
 
 ## Verify the release
 
