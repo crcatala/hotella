@@ -3,6 +3,7 @@ import { homedir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
+  AIRPORTS_DATA_REVISION,
   FALLBACK_AIRPORTS,
   isIataCode,
   parseAirportsCsv,
@@ -10,7 +11,7 @@ import {
 } from '../../src/lib/iata.js'
 
 const CACHE_DIR = join(homedir(), '.cache', 'hotella')
-const CACHE_FILE = join(CACHE_DIR, 'airports-d1907e811e38a141a3ccace73527248a19ba11af.csv')
+const CACHE_FILE = join(CACHE_DIR, `airports-${AIRPORTS_DATA_REVISION}.csv`)
 const LEGACY_CACHE_FILE = join(CACHE_DIR, 'airports.csv')
 
 describe('isIataCode', () => {

@@ -206,9 +206,19 @@ cd hotella
 pnpm install
 ```
 
-### Running
+### Refreshing airport data (maintainers)
+
+The airport dataset is pinned to an immutable upstream commit. To refresh it, start from a clean working tree and run:
 
 ```bash
+pnpm run iata:refresh
+```
+
+The command resolves the latest upstream commit, validates its schema and mapping count, and updates the pin locally. Review the revision and reported mapping count, run `pnpm run verify`, then open a dedicated PR. Watch for schema changes, unexpectedly low mapping counts, and city-name changes that could affect search locations.
+
+### Running
+
+```
 # Development mode
 pnpm dev search "Taipei" --checkin 2026-02-10 --checkout 2026-02-17
 

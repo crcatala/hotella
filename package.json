@@ -60,7 +60,8 @@
     "prepublishOnly": "pnpm run verify",
     "release": "release-it",
     "release:dry": "release-it --dry-run --no-npm --no-github",
-    "release:prep": "bash scripts/prep-release.sh"
+    "release:prep": "bash scripts/prep-release.sh",
+    "iata:refresh": "node scripts/refresh-iata-data.mjs"
   },
   "dependencies": {
     "cheerio": "^1.2.0",
