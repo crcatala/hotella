@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Pinned the remote airport dataset to an immutable upstream commit.
 - Documented Google Hotels scraping, privacy, and reliability limitations.
 - Restricted CI workflow permissions to read-only repository contents.
+- Clarified that the service is unofficial (hot-fe21).
+
+### Fixed
+
+- Validate the pinned airport dataset before use (hot-fe21).
 
 ## [0.1.1] - 2026-07-17
 
