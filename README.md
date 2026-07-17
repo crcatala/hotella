@@ -2,12 +2,14 @@
 
 Search hotel prices and availability from the terminal via Google Hotels.
 
-Uses browser impersonation to fetch Google Hotels results — no headless browser, no API key, ~0.3s response time. Get multi-platform price comparison (Booking.com, Expedia, Hotels.com, and direct hotel sites) from a single command.
+Compare prices from Booking.com, Expedia, Hotels.com, and direct hotel sites in a single command.
 
 ## Quick Start
 
 ```bash
-npx hotella search "Taipei" --checkin 2026-02-10 --checkout 2026-02-17
+npx hotella search "Taipei" \
+  --checkin "$(node -e 'console.log(new Date(Date.now() + 7 * 86_400_000).toISOString().slice(0, 10))')" \
+  --checkout "$(node -e 'console.log(new Date(Date.now() + 14 * 86_400_000).toISOString().slice(0, 10))')"
 ```
 
 ## Installation
@@ -20,12 +22,14 @@ npm install -g hotella
 pnpm add -g hotella
 
 # Or run directly with npx
-npx hotella search "Tokyo" --checkin 2026-03-01 --checkout 2026-03-05
+npx hotella --help
 ```
 
 Requires **Node.js 22** or later.
 
 ## Usage
+
+Use future dates in `YYYY-MM-DD` format. The Quick Start command above generates them automatically.
 
 ### Basic Search
 
@@ -190,23 +194,6 @@ Displays results in an aligned columnar table with hotel name, price, rating, an
 }
 ```
 
-## How It Works
-
-1. **Fetch** — [impit](https://github.com/nichochar/impit) impersonates a real browser (Chrome or Firefox TLS fingerprint + headers) to fetch Google Hotels search results as HTML. No headless browser or Puppeteer needed.
-2. **Parse** — [cheerio](https://cheerio.js.org/) extracts hotel cards from the HTML: names, prices, ratings, amenities, and booking URLs.
-3. **Filter & Sort** — Results are filtered by price/rating constraints and sorted by the chosen mode.
-4. **Format** — Output is rendered as plain text, a table, or JSON depending on the output flag and whether stdout is a TTY.
-
-The whole pipeline runs in ~0.3s — a single HTTP request with no browser overhead.
-
-## Known Limitations
-
-- **Scraping fragility** — Google Hotels HTML structure can change without notice, which may break parsing. Run `pnpm test:live` periodically to exercise the real fetch-and-parse path.
-- **Rate limiting** — Rapid or automated use may trigger Google's bot detection. The browser impersonation helps, but isn't foolproof.
-- **Currency support** — Limited to USD, EUR, GBP, JPY, and TWD. Google may not honor all currency requests for all regions.
-- **Result count** — Returns only the first page of results from Google Hotels (typically 15–25 hotels).
-- **No caching** — Every search makes a fresh HTTP request.
-
 ## Development
 
 ### Setup
@@ -248,39 +235,6 @@ pnpm test:watch
 ```bash
 # Run all checks: tests, linting, formatting, type checking
 pnpm run verify
-```
-
-### Project Structure
-
-```
-src/
-├── cli.ts              # Entry point
-├── cli/
-│   ├── program.ts      # Commander program setup
-│   ├── context.ts      # CLI context (colors, output mode)
-│   ├── spinner.ts      # Terminal spinner
-│   ├── errors.ts       # Error handling
-│   └── output.ts       # Output formatting (plain/json/table)
-├── commands/
-│   └── search.ts       # Search command implementation
-└── lib/
-    ├── fetcher.ts       # HTTP fetching via impit
-    ├── parser.ts        # HTML parsing with cheerio
-    ├── sort.ts          # Sort modes
-    ├── filters.ts       # Price/rating filters
-    ├── table.ts         # Table formatter
-    ├── iata.ts          # IATA airport code resolution
-    └── types.ts         # TypeScript types
-
-tests/
-├── unit/               # Unit tests (parser, sort, CLI args)
-├── integration/        # Subprocess CLI tests
-├── live/               # Live network tests (opt-in)
-└── fixtures/           # HTML fixtures for parser tests
-
-scripts/
-├── verify.ts           # Pre-commit verification
-└── update-fixture.sh   # Refresh HTML test fixtures
 ```
 
 ## Contributing
