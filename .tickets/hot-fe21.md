@@ -24,3 +24,11 @@ Implemented release hardening on chore/release-hardening: package-install smoke 
 **2026-07-17T03:59:09Z**
 
 Addressed PR #23 review findings: added a clean-before-build workflow to prevent stale dist artifacts, serialized package smoke verification after test/build writers, and added a release:first command/docs for the initial v0.1.0 publish.
+
+**2026-07-17T11:28:48Z**
+
+Improving release:prep with strict clean-tree detection, optional base revision, empty-range messaging, change summary, and a copyable changelog AI prompt.
+
+**2026-07-17T11:29:35Z**
+
+Updated scripts/prep-release.sh: strict porcelain clean check (including untracked files), optional validated base ref, explicit empty-range output, diff stat, and copyable Keep a Changelog AI prompt. Validated syntax and clean/invalid-ref/untracked scenarios in a temporary git repository.
