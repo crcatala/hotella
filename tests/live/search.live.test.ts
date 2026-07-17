@@ -11,6 +11,7 @@ const LIVE = process.env.HOTELLA_LIVE_TEST === '1'
 const execFileAsync = promisify(execFile)
 const PROJECT_DIR = join(__dirname, '..', '..')
 const CLI_PATH = join(PROJECT_DIR, 'dist', 'cli.js')
+const liveRequestDelayMs = Number.parseInt(process.env.HOTELLA_LIVE_REQUEST_DELAY_MS ?? '0', 10)
 
 function futureDates(): Pick<SearchQuery, 'checkin' | 'checkout'> {
   const now = new Date()
@@ -22,7 +23,13 @@ function futureDates(): Pick<SearchQuery, 'checkin' | 'checkout'> {
   }
 }
 
+async function waitForLiveRequest(): Promise<void> {
+  if (Number.isNaN(liveRequestDelayMs) || liveRequestDelayMs <= 0) return
+  await new Promise((resolve) => setTimeout(resolve, liveRequestDelayMs))
+}
+
 async function runLiveCli(args: string[]): Promise<SearchResult> {
+  await waitForLiveRequest()
   const { stdout, stderr } = await execFileAsync('node', [CLI_PATH, ...args], {
     cwd: PROJECT_DIR,
     env: { ...process.env, FORCE_COLOR: undefined, NO_COLOR: '1' },
@@ -47,6 +54,7 @@ describe.skipIf(!LIVE)('live search', () => {
       currency: 'USD',
     }
 
+    await waitForLiveRequest()
     const { html } = await fetchHotelsHtml(query)
     expect(html.length).toBeGreaterThan(1000)
 
