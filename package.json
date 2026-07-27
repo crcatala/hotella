@@ -77,7 +77,7 @@
     "lefthook": "^2.0.16",
     "oxlint": "^1.42.0",
     "prettier": "^3.8.1",
-    "release-it": "^19.2.4",
+    "release-it": "^20.0.0",
     "tasuku": "^2.0.5",
     "tsx": "^4.0.0",
     "typescript": "^5.5.0",
