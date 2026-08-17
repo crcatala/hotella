@@ -1,5 +1,8 @@
 # Supply-chain policy settings must live in the workspace config with pnpm 11.
 minimumReleaseAge: 10080
+# Renovate's artifact step runs `pnpm install --no-save`; strict mode would
+# require writing to minimumReleaseAgeExclude, which --no-save prevents.
+minimumReleaseAgeStrict: false
 allowBuilds:
   esbuild: true
   lefthook: true
