@@ -8,7 +8,7 @@ Hotella uses [release-it](https://github.com/release-it/release-it) for manual r
 - The repository is public
 - An npm account authorized to publish `hotella` (`npm whoami`)
 - A `GITHUB_TOKEN` with repository **Contents: read and write** permission
-- Node.js 22+ and pnpm
+- Node.js 22.21+ or 24+ and pnpm
 - A clean checkout on `main`
 
 ## Before releasing

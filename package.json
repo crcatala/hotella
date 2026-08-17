@@ -77,14 +77,14 @@
     "lefthook": "^2.0.16",
     "oxlint": "^1.42.0",
     "prettier": "^3.8.1",
-    "release-it": "^19.2.4",
+    "release-it": "^21.0.1",
     "tasuku": "^2.0.5",
     "tsx": "^4.0.0",
     "typescript": "^7.0.0",
     "vitest": "^4.0.0"
   },
   "engines": {
-    "node": ">=22"
+    "node": "^22.21.0 || >=24.0.0"
   },
   "publishConfig": {
     "access": "public"
