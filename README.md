@@ -27,7 +27,7 @@ pnpm add -g hotella
 npx hotella --help
 ```
 
-Requires **Node.js 22.21+ or 24+**.
+Requires **Node.js `^22.22.2 || ^24.15.0 || >=26.0.0`**.
 
 ## Usage
 
