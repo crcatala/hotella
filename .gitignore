@@ -1,3 +1,6 @@
 node_modules/
 dist/
 tests/fixtures/.raw/
+
+# Vitest cache and reporter output
+.vitest/
