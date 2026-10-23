@@ -1,4 +1,4 @@
-# hotella
+<h1><img src="assets/icon.png" width="40" height="40" align="top" alt="" /> hotella</h1>
 
 Search hotel prices and availability from the terminal via Google Hotels.
 
