@@ -1,37 +1,43 @@
 #!/usr/bin/env bash
-# Smoke-test the exact npm tarball that will be published.
-# Run via `pnpm run test:package`, which builds dist/ first.
-
+# release-standard: scripts/test-package.sh r1 (do not edit; see RELEASING.md)
+# Pack the npm tarball, install it the way a user would, and check that every command
+# answers --help and prints a standard --version line. Project-specific checks go in
+# scripts/test-package.local.sh, which is sourced with $consumer set to the install prefix.
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cd "$ROOT_DIR"
+tmpdir=$(mktemp -d)
+trap 'rm -rf "$tmpdir"' EXIT
 
-PACKAGE_NAME="$(node --input-type=module -e "import pkg from './package.json' with { type: 'json' }; console.log(pkg.name)")"
-PACKAGE_VERSION="$(node --input-type=module -e "import pkg from './package.json' with { type: 'json' }; console.log(pkg.version)")"
-TEMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/hotella-package-test.XXXXXX")"
-trap 'rm -rf "$TEMP_DIR"' EXIT
+# `npm pack` runs prepack (the build), so the tarball carries a fresh build-info stamp.
+npm pack --pack-destination "$tmpdir" >/dev/null
+archive=$(find "$tmpdir" -maxdepth 1 -name '*.tgz' | head -n 1)
+[[ -n "$archive" ]] || { echo 'Error: npm pack produced no tarball.' >&2; exit 1; }
 
-npm pack --pack-destination "$TEMP_DIR" --ignore-scripts >/dev/null
-TARBALL="$(find "$TEMP_DIR" -maxdepth 1 -name '*.tgz' -print -quit)"
+consumer="$tmpdir/consumer"
+# A normal install, so dependency install scripts run just as they do for users.
+npm install --omit=dev --no-audit --no-fund --prefix "$consumer" "$archive" >/dev/null
 
-if [[ -z "$TARBALL" ]]; then
-  echo "Package smoke test failed: npm pack did not produce a tarball." >&2
-  exit 1
+bins=$(node -e '
+  const p = require(process.argv[1]);
+  const names = typeof p.bin === "string" ? [p.name.split("/").pop()] : Object.keys(p.bin ?? {});
+  console.log(names.join(" "));
+' "$(pwd)/package.json")
+[[ -n "$bins" ]] || { echo 'Error: package.json declares no "bin".' >&2; exit 1; }
+
+version_re='^[^ ]+ [0-9]+\.[0-9]+\.[0-9]+[^ ]* \([0-9a-f]{7}(-dirty)? [0-9]{4}-[0-9]{2}-[0-9]{2}\)$'
+for bin in $bins; do
+  "$consumer/node_modules/.bin/$bin" --help >/dev/null
+  line=$("$consumer/node_modules/.bin/$bin" --version)
+  if ! [[ "$line" =~ $version_re ]]; then
+    echo "Error: '$bin --version' printed '$line'; expected '<name> X.Y.Z (sha7 YYYY-MM-DD)'." >&2
+    echo 'Check that the build runs scripts/build-info.mjs and that package.json "files" ships dist/build-info.json.' >&2
+    exit 1
+  fi
+done
+
+if [[ -f scripts/test-package.local.sh ]]; then
+  # shellcheck source=/dev/null
+  source scripts/test-package.local.sh
 fi
 
-npm install --prefix "$TEMP_DIR/install" --ignore-scripts "$TARBALL" >/dev/null
-BINARY="$TEMP_DIR/install/node_modules/.bin/hotella"
-
-if [[ ! -x "$BINARY" ]]; then
-  echo "Package smoke test failed: hotella binary was not installed." >&2
-  exit 1
-fi
-
-if [[ "$("$BINARY" --version)" != "$PACKAGE_VERSION" ]]; then
-  echo "Package smoke test failed: installed version does not match $PACKAGE_NAME@$PACKAGE_VERSION." >&2
-  exit 1
-fi
-
-"$BINARY" --help >/dev/null
-printf 'Package smoke test passed: %s@%s\n' "$PACKAGE_NAME" "$PACKAGE_VERSION"
+echo 'Package smoke test passed.'

@@ -1,0 +1,5 @@
+# Canonical release scripts, copied byte for byte from the release standard
+# (see RELEASING.md). Do not reformat: scripts/release.mjs and
+# scripts/build-info.mjs must stay identical to the shared copies.
+scripts/build-info.mjs
+scripts/release.mjs
