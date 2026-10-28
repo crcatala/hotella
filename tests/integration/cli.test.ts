@@ -43,10 +43,61 @@ async function runCli(args: string[]): Promise<ExecResult> {
 
 describe('CLI integration', () => {
   describe('--version', () => {
-    it('exits with code 0 and shows version', async () => {
+    it('exits with code 0 and prints the standard version line', async () => {
       const result = await runCli(['--version'])
       expect(result.exitCode).toBe(0)
-      expect(result.stdout.trim()).toMatch(/^\d+\.\d+\.\d+$/)
+      // <name> X.Y.Z (sha7[-dirty] YYYY-MM-DD): the commit the build came from.
+      expect(result.stdout.trim()).toMatch(
+        /^hotella \d+\.\d+\.\d+ \([0-9a-f]{7}(-dirty)? \d{4}-\d{2}-\d{2}\)$/,
+      )
+    })
+
+    it('-V prints the same line', async () => {
+      const short = await runCli(['-V'])
+      const long = await runCli(['--version'])
+      expect(short.exitCode).toBe(0)
+      expect(short.stdout).toBe(long.stdout)
+    })
+  })
+
+  describe('version', () => {
+    it('exits with code 0 and shows the details', async () => {
+      const result = await runCli(['version'])
+      expect(result.exitCode).toBe(0)
+      expect(result.stdout).toContain('version: ')
+      expect(result.stdout).toContain('commit: ')
+      expect(result.stdout).toContain('install: ')
+    })
+
+    it('prints one JSON object with --json', async () => {
+      const result = await runCli(['version', '--json'])
+      expect(result.exitCode).toBe(0)
+      const details = JSON.parse(result.stdout) as Record<string, unknown>
+      expect(Object.keys(details).sort()).toEqual([
+        'commit',
+        'date',
+        'dirty',
+        'install',
+        'path',
+        'version',
+      ])
+      expect(details.install).toBe('checkout')
+    })
+  })
+
+  describe('update', () => {
+    it('exits with code 0 and shows update help', async () => {
+      const result = await runCli(['update', '--help'])
+      expect(result.exitCode).toBe(0)
+      expect(result.stdout).toContain('--check')
+      expect(result.stdout).toContain('--force')
+    })
+
+    it('update --check exits 0, 1 or 2 without crashing', async () => {
+      const result = await runCli(['update', '--check'])
+      // 0: up to date, 1: update available, 2: could not tell (e.g. origin/main unreachable).
+      expect([0, 1, 2]).toContain(result.exitCode)
+      expect(result.stderr).not.toContain('TypeError')
     })
   })
 
