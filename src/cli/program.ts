@@ -1,6 +1,7 @@
 import { createRequire } from 'node:module'
 import { Command, Option } from 'commander'
 import { registerSearchCommand } from '../commands/search.js'
+import { runUpdate, versionDetails, versionLine } from '../cli-meta.js'
 import type { CliContext } from './context.js'
 import { formatHelpFooter, formatSharedExamples } from './help.js'
 
@@ -31,7 +32,7 @@ export function createProgram(ctx: CliContext): Command {
   program
     .name('hotella')
     .description('Search hotel prices and availability via Google Hotels')
-    .version(VERSION)
+    .version(versionLine('hotella'), '-V, --version', 'print the version and commit')
     .action(() => {
       program.help()
     })
@@ -60,6 +61,32 @@ export function createProgram(ctx: CliContext): Command {
   })
 
   registerSearchCommand(program, ctx)
+
+  program
+    .command('update')
+    .description('update hotella the way it was installed')
+    .option('--check', 'report only: exit 0 up to date, 1 update available, 2 unknown')
+    .option('--force', 'update even when already up to date')
+    .action((opts: { check?: boolean; force?: boolean }) => {
+      process.exitCode = runUpdate('hotella', opts)
+    })
+
+  program
+    .command('version')
+    .description('print version, commit, date, install method and path')
+    // `--json` is the program's global option; commander parses it there even after the
+    // subcommand, so the handler reads it from optsWithGlobals() rather than a local option.
+    .action((_opts: Record<string, never>, command: Command) => {
+      const details = versionDetails()
+      const { json } = command.optsWithGlobals() as { json?: boolean }
+      console.log(
+        json
+          ? JSON.stringify(details)
+          : Object.entries(details)
+              .map(([key, value]) => `${key}: ${value}`)
+              .join('\n'),
+      )
+    })
 
   return program
 }

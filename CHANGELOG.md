@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `hotella update [--check] [--force]` updates hotella the way it was installed: a source checkout pulls, installs and rebuilds; a global npm, pnpm, bun or mise install reinstalls from the registry.
+- `hotella version [--json]` prints the version, full commit, commit date, dirty state, install method and install path.
+
+### Changed
+
+- `hotella --version` now prints `hotella X.Y.Z (sha7 YYYY-MM-DD)`: the commit the build came from, with `-dirty` for builds from an uncommitted tree.
+- Releases run `pnpm run verify`, the changelog check and the package smoke test, then publish from the release commit and tag (see `RELEASING.md`).
+
 ## [0.1.3] - 2026-07-17
 
 ### Added

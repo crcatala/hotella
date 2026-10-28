@@ -14,6 +14,36 @@ describe('CLI arg parsing', () => {
     expect(search).toBeDefined()
   })
 
+  it('has update and version subcommands', () => {
+    const program = makeProgram()
+    const names = program.commands.map((c) => c.name())
+    expect(names).toContain('update')
+    expect(names).toContain('version')
+  })
+
+  it('update has --check and --force', () => {
+    const program = makeProgram()
+    const update = program.commands.find((c) => c.name() === 'update')!
+    const opts = update.options.map((o) => o.long)
+    expect(opts).toContain('--check')
+    expect(opts).toContain('--force')
+  })
+
+  it('prints the standard version line for --version', () => {
+    const program = makeProgram()
+    program.exitOverride()
+    let versionOutput = ''
+    program.configureOutput({ writeOut: (str) => (versionOutput += str) })
+    try {
+      program.parse(['--version'], { from: 'user' })
+    } catch {
+      // Commander throws on --version with exitOverride
+    }
+    expect(versionOutput.trim()).toMatch(
+      /^hotella \d+\.\d+\.\d+ \([0-9a-f]{7}(-dirty)? \d{4}-\d{2}-\d{2}\)$/,
+    )
+  })
+
   it('shows help output without error', () => {
     const program = makeProgram(['--help'])
     program.exitOverride()
