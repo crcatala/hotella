@@ -14,20 +14,36 @@ npx hotella search "Taipei" --checkin <future-checkin-date> --checkout <future-c
 
 Replace the placeholders with your travel dates in `YYYY-MM-DD` format.
 
-## Installation
+## Install
 
 ```bash
-# npm
-npm install -g hotella
-
-# pnpm
-pnpm add -g hotella
-
-# Or run directly with npx
-npx hotella --help
+npm install -g hotella       # or: pnpm add -g hotella, bun add -g hotella
+npx hotella --help           # run without installing
 ```
 
 Requires **Node.js `^22.22.2 || ^24.15.0 || >=26.0.0`**.
+
+### From source
+
+```bash
+git clone https://github.com/crcatala/hotella.git
+cd hotella
+pnpm install
+pnpm build
+pnpm link                    # puts `hotella` on your PATH, pointing at this clone
+hotella --version            # hotella X.Y.Z (sha7 YYYY-MM-DD): the commit you built
+```
+
+Rebuild after pulling (`pnpm build`); the link keeps pointing at the clone. If
+`hotella` is also installed globally, remove that copy so the linked build is the
+one on `PATH` (`command -v hotella` should resolve inside the clone).
+
+### Updating
+
+```bash
+hotella update --check       # exit 0: up to date, 1: update available, 2: unknown
+hotella update               # updates the same way it was installed
+```
 
 ## Usage
 
@@ -127,16 +143,29 @@ hotella search [options] <location>
 
 ### Global Options
 
-| Flag         | Description                                  |
-| ------------ | -------------------------------------------- |
-| `--json`     | Structured JSON output                       |
-| `--plain`    | Human-readable list output                   |
-| `--table`    | Aligned columnar table output                |
-| `--verbose`  | Show operational progress                    |
-| `--debug`    | Show debug information (implies `--verbose`) |
-| `--no-color` | Disable colors                               |
-| `--version`  | Show version number                          |
-| `--help`     | Show help                                    |
+| Flag         | Description                                   |
+| ------------ | --------------------------------------------- |
+| `--json`     | Structured JSON output                        |
+| `--plain`    | Human-readable list output                    |
+| `--table`    | Aligned columnar table output                 |
+| `--verbose`  | Show operational progress                     |
+| `--debug`    | Show debug information (implies `--verbose`)  |
+| `--no-color` | Disable colors                                |
+| `--version`  | Print the version and the commit it came from |
+| `--help`     | Show help                                     |
+
+### Update and version
+
+```bash
+hotella update               # update hotella the way it was installed
+hotella update --check       # report only: 0 up to date, 1 update available, 2 unknown
+hotella update --force       # update even when already up to date
+hotella version              # version, commit, date, dirty state, install method and path
+hotella version --json       # the same details as one JSON object
+```
+
+`hotella --version` prints `hotella <version> (<sha7> <YYYY-MM-DD>)`: the commit the
+build came from, with `-dirty` when the working tree had uncommitted changes.
 
 ### Environment Variables
 
